@@ -1,0 +1,14 @@
+{
+  "name": "graphenex-academy",
+  "version": "1.0.0",
+  "description": "GrapheneX Academy - Staff Learning Portal",
+  "scripts": {
+    "dev": "npx serve .",
+    "build": "echo 'Static site - no build required'"
+  },
+  "dependencies": {
+    "@vercel/analytics": "^1.4.1"
+  },
+  "devDependencies": {},
+  "private": true
+}
