@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GrapheneX Academy</title>
+  <meta name="description" content="Immersive staff learning portal for IT, Cybersecurity, Office365, and company-specific tools." />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="bg-layer"></div>
+
+  <div class="app-shell">
+    <aside id="profileSidebar" class="profile-sidebar card" aria-label="User profile sidebar">
+      <button id="sidebarClose" class="sidebar-close btn btn-ghost" type="button" aria-label="Close profile sidebar">×</button>
+      <div class="profile-head">
+        <img src="profile-avatar.svg" alt="User profile avatar" class="profile-avatar" />
+        <div>
+          <p class="eyebrow">Learner Profile</p>
+          <h2 class="profile-name">Morgan Lee</h2>
+          <p class="profile-role">Operations Analyst</p>
+        </div>
+      </div>
+
+      <nav class="profile-nav" aria-label="Profile navigation">
+        <a href="#dashboard" data-sidebar-nav>Dashboard</a>
+        <a href="#modules" data-sidebar-nav>Learning Modules</a>
+        <a href="#recommendations" data-sidebar-nav>Recommendations</a>
+        <a href="#sidebarSettings" data-sidebar-nav>Settings</a>
+        <a href="#sidebarAccount" data-sidebar-nav>Account Info</a>
+      </nav>
+
+      <section id="sidebarSettings" class="sidebar-block">
+        <h3>Settings</h3>
+        <ul>
+          <li>High Contrast Theme: Enabled</li>
+          <li>Text Size: Medium</li>
+          <li>Keyboard Navigation: Active</li>
+        </ul>
+      </section>
+
+      <section id="sidebarAccount" class="sidebar-block">
+        <h3>Account Info</h3>
+        <p><strong>Email:</strong> morgan.lee@graphenex.com</p>
+        <p><strong>Department:</strong> Digital Operations</p>
+        <p><strong>Access Level:</strong> Standard Learner</p>
+      </section>
+    </aside>
+
+    <div class="app-main">
+      <header class="site-header">
+        <nav class="nav container">
+          <div class="brand">
+            <div>
+              <h1>GrapheneX Academy</h1>
+              <p>Empowering People. Securing Tomorrow.</p>
+            </div>
+          </div>
+          <div class="top-actions">
+            <button id="sidebarToggle" class="btn" type="button" aria-controls="profileSidebar" aria-expanded="false">Profile Menu</button>
+            <button id="resetProgressBtn" class="btn btn-ghost" type="button">Reset Progress</button>
+          </div>
+        </nav>
+      </header>
+      <main>
+        <section id="dashboard" class="hero container">
+      <div class="hero-copy">
+        <p class="eyebrow">Staff Enablement Platform</p>
+        <h2>Master IT, Cybersecurity, Office365, and Internal Tools</h2>
+        <p>
+          Explore focused modules, complete quick checkpoints, and track your growth in one immersive learning workspace.
+        </p>
+        <div class="hero-actions">
+          <a href="#modules" class="btn btn-primary">Start Learning</a>
+          <button id="jumpToRecommendations" class="btn" type="button">My Next Best Module</button>
+        </div>
+      </div>
+      <div class="hero-stats card">
+        <h3>Learning Progress</h3>
+        <div class="progress-wrap" aria-label="Overall progress">
+          <div id="overallProgressBar" class="progress-bar"></div>
+        </div>
+        <p id="overallProgressText">0% completed</p>
+        <div class="stat-grid">
+          <div>
+            <strong id="completedCount">0</strong>
+            <span>Completed</span>
+          </div>
+          <div>
+            <strong id="remainingCount">0</strong>
+            <span>Remaining</span>
+          </div>
+          <div>
+            <strong id="avgDifficulty">-</strong>
+            <span>Avg Difficulty</span>
+          </div>
+        </div>
+      </div>
+        </section>
+
+        <section class="controls container" id="modules">
+      <div class="search-box card">
+        <label for="searchInput">Search topics, skills, or tools</label>
+        <input id="searchInput" type="search" placeholder="Try: phishing, Excel, endpoint management..." />
+      </div>
+      <div class="filters card" role="group" aria-label="Category filters">
+        <button class="chip active" data-filter="all" type="button">All</button>
+        <button class="chip" data-filter="it" type="button">IT</button>
+        <button class="chip" data-filter="cybersecurity" type="button">Cybersecurity</button>
+        <button class="chip" data-filter="office365" type="button">Office365</button>
+        <button class="chip" data-filter="company-tools" type="button">Company Tools</button>
+      </div>
+        </section>
+
+        <section class="container">
+      <div class="section-head">
+        <h3>Learning Modules</h3>
+        <p id="resultCount">0 modules</p>
+      </div>
+      <div id="moduleGrid" class="module-grid" aria-live="polite"></div>
+        </section>
+
+        <section class="container spotlight" id="recommendations">
+      <div class="card recommendation-card">
+        <h3>Recommended Next Module</h3>
+        <p id="recommendedText">Complete a module to unlock personalized recommendations.</p>
+        <button id="openRecommendation" class="btn btn-primary" type="button" disabled>Open Module</button>
+      </div>
+        </section>
+      </main>
+
+      <footer class="site-footer">
+        <div class="container">
+          <p>© <span id="year"></span> GrapheneX Academy • Built for staff development and secure operations.</p>
+        </div>
+      </footer>
+    </div>
+  </div>
+
+  <div id="moduleModal" class="modal hidden" aria-hidden="true" role="dialog" aria-labelledby="modalTitle">
+    <div class="modal-panel card">
+      <button id="closeModal" class="close-btn" aria-label="Close module details" type="button">×</button>
+      <p id="modalCategory" class="eyebrow"></p>
+      <h3 id="modalTitle"></h3>
+      <p id="modalDescription"></p>
+
+      <div class="modal-meta">
+        <span id="modalDuration"></span>
+        <span id="modalDifficulty"></span>
+        <span id="modalToolset"></span>
+      </div>
+
+      <div>
+        <h4>Key Lessons</h4>
+        <ul id="lessonList"></ul>
+      </div>
+
+      <div class="quiz-box">
+        <h4>Quick Check</h4>
+        <p id="quizQuestion"></p>
+        <div id="quizOptions" class="quiz-options"></div>
+        <p id="quizFeedback" class="quiz-feedback"></p>
+      </div>
+
+      <div class="modal-actions">
+        <button id="markCompleteBtn" class="btn btn-primary" type="button">Mark as Completed</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+  <script src="auth.js"></script>
+</body>
+</html>

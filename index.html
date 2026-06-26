@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GrapheneX Academy Access</title>
+  <meta name="description" content="Secure access portal for GrapheneX Academy staff learning platform." />
+  <link rel="stylesheet" href="auth.css" />
+</head>
+<body>
+  <div class="auth-bg-layer" aria-hidden="true"></div>
+
+  <main class="auth-shell">
+    <section class="auth-panel" aria-labelledby="authTitle">
+      <p class="eyebrow">Secure Staff Access</p>
+      <h1 id="authTitle">Welcome to GrapheneX Academy</h1>
+      <p class="auth-subcopy">Sign in to continue your learning path, track completion, and access personalized recommendations.</p>
+
+      <form id="accessForm" class="auth-form" novalidate>
+        <label for="email">Work Email</label>
+        <input id="email" name="email" type="email" autocomplete="email" placeholder="name@graphenex.com" required />
+
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password" autocomplete="current-password" placeholder="Enter your password" minlength="8" required />
+
+        <div class="auth-options">
+          <label class="remember-option">
+            <input id="rememberMe" type="checkbox" />
+            Remember me on this device
+          </label>
+          <a href="#" aria-disabled="true">Forgot password?</a>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Sign In</button>
+      </form>
+
+      <p id="authMessage" class="auth-message" role="status" aria-live="polite"></p>
+
+      <div class="auth-links">
+        <a class="btn" href="portal-access.html">Continue as Guest</a>
+      </div>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+  <script src="auth.js"></script>
+
+  <script>
+document.getElementById("loginForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const res = await fetch("/api/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      email: document.getElementById("email").value,
+      password: document.getElementById("password").value
+    })
+  });
+
+  const data = await res.json();
+
+  if (data.success) {
+    window.location.href = "/dashboard.html";
+  } else {
+    alert("Login failed: " + data.message);
+  }
+});
+</script>
+</body>
+</html>
