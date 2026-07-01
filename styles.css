@@ -50,6 +50,43 @@ body.sidebar-open {
   z-index: -1;
 }
 
+.page-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: grid;
+  place-items: center;
+  background: radial-gradient(circle at 20% 20%, #2a1240 0%, var(--bg-2) 42%, var(--bg-1) 100%);
+  transition: opacity 0.45s ease, visibility 0.45s ease;
+}
+
+.page-loader-inner {
+  width: min(700px, 92vw);
+  text-align: center;
+}
+
+.loader-video {
+  width: 100%;
+  max-height: 62vh;
+  object-fit: cover;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+}
+
+.loader-text {
+  margin-top: 12px;
+  color: var(--muted);
+  font-size: 0.95rem;
+  letter-spacing: 0.03em;
+}
+
+.page-loader.is-hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
 .container {
   width: min(1120px, 92%);
   margin: 0 auto;
@@ -383,6 +420,36 @@ input[type="search"]:focus {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 14px;
+}
+
+.firebase-course-grid {
+  margin: 12px 0 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 14px;
+}
+
+.firebase-course-card {
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.firebase-course-card h4 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.firebase-course-card p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.firebase-course-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .module-card {

@@ -6,8 +6,18 @@
   <title>GrapheneX Academy</title>
   <meta name="description" content="Immersive staff learning portal for IT, Cybersecurity, Office365, and company-specific tools." />
   <link rel="stylesheet" href="styles.css" />
+  <script type="module" src="firebase.js"></script>
 </head>
 <body>
+  <div id="pageLoader" class="page-loader" role="status" aria-live="polite" aria-label="Loading GrapheneX Academy">
+    <div class="page-loader-inner">
+      <video id="loaderVideo" class="loader-video" autoplay muted playsinline preload="auto">
+        <source src="GrapheneX Academy - intro Video.mp4" type="video/mp4" />
+      </video>
+      <p class="loader-text">Loading GrapheneX Academy...</p>
+    </div>
+  </div>
+
   <div class="bg-layer"></div>
 
   <div class="app-shell">
@@ -59,6 +69,7 @@
           <div class="top-actions">
             <button id="sidebarToggle" class="btn" type="button" aria-controls="profileSidebar" aria-expanded="false">Profile Menu</button>
             <button id="resetProgressBtn" class="btn btn-ghost" type="button">Reset Progress</button>
+            <button id="signOutBtn" class="btn" type="button">Sign Out</button>
           </div>
         </nav>
       </header>
@@ -110,6 +121,14 @@
         <button class="chip" data-filter="office365" type="button">Office365</button>
         <button class="chip" data-filter="company-tools" type="button">Company Tools</button>
       </div>
+        </section>
+
+        <section class="container" id="firebase-courses">
+          <div class="section-head">
+            <h3>Courses from Firebase</h3>
+            <p>Live catalog</p>
+          </div>
+          <div id="coursesContainer" class="firebase-course-grid" aria-live="polite"></div>
         </section>
 
         <section class="container">
@@ -168,6 +187,7 @@
     </div>
   </div>
 
+  <script type="module" src="courses.js"></script>
   <script src="script.js"></script>
   <script src="auth.js"></script>
 </body>

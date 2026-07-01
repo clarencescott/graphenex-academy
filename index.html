@@ -6,6 +6,7 @@
   <title>GrapheneX Academy Access</title>
   <meta name="description" content="Secure access portal for GrapheneX Academy staff learning platform." />
   <link rel="stylesheet" href="auth.css" />
+  <script type="module" src="firebase.js"></script>
 </head>
 <body>
   <div class="auth-bg-layer" aria-hidden="true"></div>
@@ -16,56 +17,56 @@
       <h1 id="authTitle">Welcome to GrapheneX Academy</h1>
       <p class="auth-subcopy">Sign in to continue your learning path, track completion, and access personalized recommendations.</p>
 
-      <form id="accessForm" class="auth-form" novalidate>
-        <label for="email">Work Email</label>
-        <input id="email" name="email" type="email" autocomplete="email" placeholder="name@graphenex.com" required />
-
-        <label for="password">Password</label>
-        <input id="password" name="password" type="password" autocomplete="current-password" placeholder="Enter your password" minlength="8" required />
-
-        <div class="auth-options">
-          <label class="remember-option">
-            <input id="rememberMe" type="checkbox" />
-            Remember me on this device
-          </label>
-          <a href="#" aria-disabled="true">Forgot password?</a>
-        </div>
-
-        <button type="submit" class="btn btn-primary">Sign In</button>
-      </form>
-
-      <p id="authMessage" class="auth-message" role="status" aria-live="polite"></p>
-
-      <div class="auth-links">
-        <a class="btn" href="portal-access.html">Continue as Guest</a>
+      <div class="auth-tabs" role="tablist" aria-label="Authentication options">
+        <button id="loginTabBtn" class="auth-tab active" role="tab" aria-selected="true" aria-controls="loginPanel" type="button">Login</button>
+        <button id="signupTabBtn" class="auth-tab" role="tab" aria-selected="false" aria-controls="signupPanel" type="button">Sign Up</button>
       </div>
+
+      <section id="loginPanel" class="auth-panel-section" role="tabpanel" aria-labelledby="loginTabBtn">
+        <form id="accessForm" class="auth-form" novalidate>
+          <label for="email">Work Email</label>
+          <input id="email" name="email" type="email" autocomplete="email" placeholder="name@graphenex.com" required />
+
+          <label for="password">Password</label>
+          <input id="password" name="password" type="password" autocomplete="current-password" placeholder="Enter your password" minlength="8" required />
+
+          <div class="auth-options">
+            <label class="remember-option">
+              <input id="rememberMe" type="checkbox" />
+              Remember me on this device
+            </label>
+            <a href="#" aria-disabled="true">Forgot password?</a>
+          </div>
+
+          <button type="submit" class="btn btn-primary">Sign In</button>
+        </form>
+
+        <p id="authMessage" class="auth-message" role="status" aria-live="polite"></p>
+      </section>
+
+      <section id="signupPanel" class="signup-section auth-panel-section hidden-panel" aria-labelledby="signupTitle" role="tabpanel" aria-hidden="true">
+        <h2 id="signupTitle">Create your account</h2>
+        <form id="signupForm" class="auth-form" novalidate>
+          <label for="signupName">Full Name</label>
+          <input id="signupName" name="signupName" type="text" autocomplete="name" placeholder="Jane Doe" required />
+
+          <label for="signupEmail">Work Email</label>
+          <input id="signupEmail" name="signupEmail" type="email" autocomplete="email" placeholder="name@graphenex.com" required />
+
+          <label for="signupPassword">Create Password</label>
+          <input id="signupPassword" name="signupPassword" type="password" autocomplete="new-password" minlength="8" placeholder="At least 8 characters" required />
+
+          <label for="signupConfirmPassword">Confirm Password</label>
+          <input id="signupConfirmPassword" name="signupConfirmPassword" type="password" autocomplete="new-password" minlength="8" placeholder="Re-enter your password" required />
+
+          <button type="submit" class="btn">Register / Sign Up</button>
+        </form>
+        <p id="signupMessage" class="auth-message" role="status" aria-live="polite"></p>
+      </section>
     </section>
   </main>
 
-  <script src="script.js"></script>
   <script src="auth.js"></script>
 
-  <script>
-document.getElementById("loginForm").addEventListener("submit", async (e) => {
-  e.preventDefault();
-
-  const res = await fetch("/api/login", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      email: document.getElementById("email").value,
-      password: document.getElementById("password").value
-    })
-  });
-
-  const data = await res.json();
-
-  if (data.success) {
-    window.location.href = "/dashboard.html";
-  } else {
-    alert("Login failed: " + data.message);
-  }
-});
-</script>
 </body>
 </html>

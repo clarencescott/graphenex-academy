@@ -346,6 +346,8 @@ const state = {
 };
 
 const el = {
+  pageLoader: document.getElementById("pageLoader"),
+  loaderVideo: document.getElementById("loaderVideo"),
   profileSidebar: document.getElementById("profileSidebar"),
   sidebarToggle: document.getElementById("sidebarToggle"),
   sidebarClose: document.getElementById("sidebarClose"),
@@ -676,6 +678,41 @@ function toggleSidebar() {
   }
 }
 
+function hidePageLoader() {
+  if (!el.pageLoader) {
+    return;
+  }
+
+  el.pageLoader.classList.add("is-hidden");
+}
+
+function setupPageLoader() {
+  if (!el.pageLoader) {
+    return;
+  }
+
+  const fallbackTimer = window.setTimeout(hidePageLoader, 5200);
+
+  if (el.loaderVideo) {
+    el.loaderVideo.addEventListener(
+      "ended",
+      () => {
+        window.clearTimeout(fallbackTimer);
+        hidePageLoader();
+      },
+      { once: true }
+    );
+  }
+
+  window.addEventListener(
+    "load",
+    () => {
+      window.setTimeout(hidePageLoader, 1300);
+    },
+    { once: true }
+  );
+}
+
 function wireEvents() {
   el.searchInput.addEventListener("input", (event) => {
     state.searchText = event.target.value;
@@ -744,6 +781,7 @@ function wireEvents() {
 }
 
 function init() {
+  setupPageLoader();
   el.year.textContent = new Date().getFullYear();
   wireEvents();
   updateStats();
