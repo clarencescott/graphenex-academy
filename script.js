@@ -657,24 +657,37 @@ function escapeHtml(value) {
 
 function openSidebar() {
   document.body.classList.add("sidebar-open");
+}
+
+function closeSidebar() {
+  document.body.classList.remove("sidebar-open");
+}
+
+function showProfileMenuDetails() {
+  document.body.classList.remove("profile-menu-collapsed");
   if (el.sidebarToggle) {
     el.sidebarToggle.setAttribute("aria-expanded", "true");
   }
 }
 
-function closeSidebar() {
-  document.body.classList.remove("sidebar-open");
+function hideProfileMenuDetails() {
+  document.body.classList.add("profile-menu-collapsed");
   if (el.sidebarToggle) {
     el.sidebarToggle.setAttribute("aria-expanded", "false");
   }
 }
 
-function toggleSidebar() {
-  const isOpen = document.body.classList.contains("sidebar-open");
-  if (isOpen) {
-    closeSidebar();
-  } else {
+function toggleProfileMenu() {
+  const isMobile = window.matchMedia("(max-width: 950px)").matches;
+  if (isMobile && !document.body.classList.contains("sidebar-open")) {
     openSidebar();
+  }
+
+  const isCollapsed = document.body.classList.contains("profile-menu-collapsed");
+  if (isCollapsed) {
+    showProfileMenuDetails();
+  } else {
+    hideProfileMenuDetails();
   }
 }
 
@@ -743,11 +756,16 @@ function wireEvents() {
 
     if (event.key === "Escape" && document.body.classList.contains("sidebar-open")) {
       closeSidebar();
+      return;
+    }
+
+    if (event.key === "Escape" && !document.body.classList.contains("profile-menu-collapsed")) {
+      hideProfileMenuDetails();
     }
   });
 
   if (el.sidebarToggle) {
-    el.sidebarToggle.addEventListener("click", toggleSidebar);
+    el.sidebarToggle.addEventListener("click", toggleProfileMenu);
   }
 
   if (el.sidebarClose) {
@@ -782,6 +800,7 @@ function wireEvents() {
 
 function init() {
   setupPageLoader();
+  hideProfileMenuDetails();
   el.year.textContent = new Date().getFullYear();
   wireEvents();
   updateStats();

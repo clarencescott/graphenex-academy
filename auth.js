@@ -14,6 +14,23 @@ const loginTabBtn = document.getElementById("loginTabBtn");
 const signupTabBtn = document.getElementById("signupTabBtn");
 const loginPanel = document.getElementById("loginPanel");
 const signupPanel = document.getElementById("signupPanel");
+const profileName = document.getElementById("profileName");
+const profileRole = document.getElementById("profileRole");
+const profileEmail = document.getElementById("profileEmail");
+const profileDepartment = document.getElementById("profileDepartment");
+const profileAccessLevel = document.getElementById("profileAccessLevel");
+const accountSettingsForm = document.getElementById("accountSettingsForm");
+const settingsUserName = document.getElementById("settingsUserName");
+const settingsEmail = document.getElementById("settingsEmail");
+const settingsRole = document.getElementById("settingsRole");
+const settingsDepartment = document.getElementById("settingsDepartment");
+const settingsCurrentPassword = document.getElementById("settingsCurrentPassword");
+const settingsNewPassword = document.getElementById("settingsNewPassword");
+const settingsConfirmPassword = document.getElementById("settingsConfirmPassword");
+const settingsMessage = document.getElementById("settingsMessage");
+
+let activePortalUser = null;
+let activePortalProfile = null;
 
 function setMessage(text, success = false) {
   if (!authMessage) return;
@@ -25,6 +42,12 @@ function setSignupMessage(text, success = false) {
   if (!signupMessage) return;
   signupMessage.textContent = text;
   signupMessage.classList.toggle("success", success);
+}
+
+function setSettingsMessage(text, success = false) {
+  if (!settingsMessage) return;
+  settingsMessage.textContent = text;
+  settingsMessage.classList.toggle("success", success);
 }
 
 function isValidCorporateEmail(value) {
@@ -48,6 +71,24 @@ function toFriendlyAuthError(errorCode) {
     default:
       return "Sign-in failed. Please verify your Firebase account credentials.";
   }
+}
+
+function toFriendlySettingsError(error) {
+  const code = error?.code || "";
+
+  if (code === "permission-denied") {
+    return "Update blocked by Firestore rules (permission denied).";
+  }
+
+  if (code === "auth/requires-recent-login") {
+    return "For security, please sign in again before changing email or password.";
+  }
+
+  if (code === "auth/wrong-password") {
+    return "Current password is incorrect.";
+  }
+
+  return toFriendlyAuthError(code);
 }
 
 function waitForFirebaseAuthApi() {
@@ -105,15 +146,61 @@ function setupAuthTabs() {
   signupTabBtn.addEventListener("click", () => setActiveAuthTab("signup"));
 }
 
+function applyPortalProfile(user, profileData) {
+  if (!profileName && !profileRole && !profileEmail && !profileDepartment && !profileAccessLevel) {
+    return;
+  }
+
+  const fullName =
+    profileData?.userName ||
+    profileData?.name ||
+    profileData?.fullName ||
+    profileData?.displayName ||
+    user?.displayName ||
+    "Learner";
+  const role = profileData?.role || profileData?.title || "Team Member";
+  const email = profileData?.email || profileData?.userEmail || user?.email || "-";
+  const department = profileData?.department || "Not specified";
+  const accessLevel = profileData?.accessLevel || profileData?.level || "Standard Learner";
+
+  if (profileName) profileName.textContent = fullName;
+  if (profileRole) profileRole.textContent = role;
+  if (profileEmail) profileEmail.textContent = email;
+  if (profileDepartment) profileDepartment.textContent = department;
+  if (profileAccessLevel) profileAccessLevel.textContent = accessLevel;
+
+  if (settingsUserName) settingsUserName.value = fullName;
+  if (settingsEmail) settingsEmail.value = email !== "-" ? email : "";
+  if (settingsRole) settingsRole.value = role !== "Team Member" ? role : "";
+  if (settingsDepartment) settingsDepartment.value = department !== "Not specified" ? department : "";
+}
+
+async function loadPortalProfile(api, user) {
+  try {
+    const profileData = await api.getUserProfileForAuthUser(user);
+    activePortalUser = user;
+    activePortalProfile = profileData;
+    applyPortalProfile(user, profileData);
+  } catch (error) {
+    console.error("Unable to fetch profile by UID:", error);
+    activePortalUser = user;
+    activePortalProfile = null;
+    applyPortalProfile(user, null);
+  }
+}
+
 async function protectDashboardRoute(api) {
   if (!window.location.pathname.toLowerCase().includes("portal-access.html")) {
     return;
   }
 
-  api.observeAuthState((user) => {
+  api.observeAuthState(async (user) => {
     if (!user) {
       window.location.replace("index.html");
+      return;
     }
+
+    await loadPortalProfile(api, user);
   });
 }
 
@@ -195,13 +282,116 @@ function setupSignupPage(api) {
     }
 
     try {
-      await api.register(email, password, true);
+      const userCredential = await api.register(email, password, true);
+      await api.upsertUserProfile(userCredential.user.uid, {
+        email,
+        name: fullName,
+        userName: fullName,
+        role: "Learner",
+        createdAt: new Date().toISOString(),
+        lastLogin: new Date().toISOString()
+      });
+
       setSignupMessage("Account created successfully. Redirecting to portal…", true);
       window.setTimeout(() => {
         window.location.replace("portal-access.html");
       }, 500);
     } catch (error) {
       setSignupMessage(toFriendlyAuthError(error?.code));
+    }
+  });
+}
+
+function setupPortalSettings(api) {
+  if (!accountSettingsForm) {
+    return;
+  }
+
+  accountSettingsForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    if (!activePortalUser) {
+      setSettingsMessage("No authenticated user found.");
+      return;
+    }
+
+    const requestedUserName = settingsUserName?.value.trim() ?? "";
+    const requestedEmailRaw = settingsEmail?.value.trim() ?? "";
+  const requestedRole = settingsRole?.value.trim() ?? "";
+  const requestedDepartment = settingsDepartment?.value.trim() ?? "";
+    const requestedEmail = requestedEmailRaw.toLowerCase();
+    const currentPassword = settingsCurrentPassword?.value ?? "";
+    const newPassword = settingsNewPassword?.value ?? "";
+    const confirmPassword = settingsConfirmPassword?.value ?? "";
+
+    if (!requestedUserName) {
+      setSettingsMessage("Username cannot be blank.");
+      return;
+    }
+
+    if (!isValidCorporateEmail(requestedEmail)) {
+      setSettingsMessage("Please enter a valid email address.");
+      return;
+    }
+
+    if (newPassword && newPassword.length < 8) {
+      setSettingsMessage("New password must be at least 8 characters.");
+      return;
+    }
+
+    if (newPassword && newPassword !== confirmPassword) {
+      setSettingsMessage("New password and confirmation do not match.");
+      return;
+    }
+
+    const currentEmail = (activePortalUser.email || "").toLowerCase();
+    const emailChanged = requestedEmail !== currentEmail;
+    const passwordChanged = Boolean(newPassword);
+
+    if ((emailChanged || passwordChanged) && !currentPassword) {
+      setSettingsMessage("Current password is required to change email or password.");
+      return;
+    }
+
+    try {
+      if (emailChanged) {
+        await api.updateCurrentUserEmail(requestedEmail, currentPassword);
+      }
+
+      if (passwordChanged) {
+        await api.updateCurrentUserPassword(newPassword, currentPassword);
+      }
+
+      await api.upsertUserProfile(activePortalUser.uid, {
+        email: requestedEmail,
+        userName: requestedUserName,
+        name: activePortalProfile?.name || requestedUserName,
+        role: requestedRole || activePortalProfile?.role || "Learner",
+        department: requestedDepartment || activePortalProfile?.department || "Not specified",
+        accessLevel: activePortalProfile?.accessLevel || "Standard Learner",
+        lastLogin: new Date().toISOString()
+      });
+
+      const refreshedUser = api.getCurrentUser() || activePortalUser;
+      activePortalUser = refreshedUser;
+      activePortalProfile = {
+        ...(activePortalProfile || {}),
+        email: requestedEmail,
+        userName: requestedUserName,
+        name: activePortalProfile?.name || requestedUserName,
+        role: requestedRole || activePortalProfile?.role || "Learner",
+        department: requestedDepartment || activePortalProfile?.department || "Not specified"
+      };
+
+      applyPortalProfile(activePortalUser, activePortalProfile);
+      if (settingsCurrentPassword) settingsCurrentPassword.value = "";
+      if (settingsNewPassword) settingsNewPassword.value = "";
+      if (settingsConfirmPassword) settingsConfirmPassword.value = "";
+
+      setSettingsMessage("Settings updated successfully.", true);
+    } catch (error) {
+      console.error(error);
+      setSettingsMessage(toFriendlySettingsError(error));
     }
   });
 }
@@ -235,6 +425,7 @@ function setupPortalSignOut(api) {
     await protectDashboardRoute(api);
     await setupLoginPage(api);
     setupSignupPage(api);
+  setupPortalSettings(api);
     setupPortalSignOut(api);
   } catch (error) {
     setMessage("Authentication is unavailable. Please refresh and try again.");

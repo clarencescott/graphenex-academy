@@ -27,8 +27,8 @@
         <img src="profile-avatar.svg" alt="User profile avatar" class="profile-avatar" />
         <div>
           <p class="eyebrow">Learner Profile</p>
-          <h2 class="profile-name">Morgan Lee</h2>
-          <p class="profile-role">Operations Analyst</p>
+          <h2 id="profileName" class="profile-name">Loading profile...</h2>
+          <p id="profileRole" class="profile-role">Loading role...</p>
         </div>
       </div>
 
@@ -42,18 +42,38 @@
 
       <section id="sidebarSettings" class="sidebar-block">
         <h3>Settings</h3>
-        <ul>
-          <li>High Contrast Theme: Enabled</li>
-          <li>Text Size: Medium</li>
-          <li>Keyboard Navigation: Active</li>
-        </ul>
+        <form id="accountSettingsForm" class="settings-form" novalidate>
+          <label for="settingsUserName">Username</label>
+          <input id="settingsUserName" type="text" placeholder="Choose your username" />
+
+          <label for="settingsEmail">Email</label>
+          <input id="settingsEmail" type="email" placeholder="name@company.com" />
+
+          <label for="settingsRole">Role</label>
+          <input id="settingsRole" type="text" placeholder="e.g. Developer" />
+
+          <label for="settingsDepartment">Department</label>
+          <input id="settingsDepartment" type="text" placeholder="e.g. Engineering" />
+
+          <label for="settingsCurrentPassword">Current Password</label>
+          <input id="settingsCurrentPassword" type="password" autocomplete="current-password" placeholder="Required for email/password updates" />
+
+          <label for="settingsNewPassword">New Password</label>
+          <input id="settingsNewPassword" type="password" autocomplete="new-password" placeholder="Leave blank to keep current password" />
+
+          <label for="settingsConfirmPassword">Confirm New Password</label>
+          <input id="settingsConfirmPassword" type="password" autocomplete="new-password" placeholder="Re-enter new password" />
+
+          <button id="saveSettingsBtn" class="btn" type="submit">Save Settings</button>
+        </form>
+        <p id="settingsMessage" class="settings-message" role="status" aria-live="polite"></p>
       </section>
 
       <section id="sidebarAccount" class="sidebar-block">
         <h3>Account Info</h3>
-        <p><strong>Email:</strong> morgan.lee@graphenex.com</p>
-        <p><strong>Department:</strong> Digital Operations</p>
-        <p><strong>Access Level:</strong> Standard Learner</p>
+        <p><strong>Email:</strong> <span id="profileEmail">-</span></p>
+        <p><strong>Department:</strong> <span id="profileDepartment">-</span></p>
+        <p><strong>Access Level:</strong> <span id="profileAccessLevel">-</span></p>
       </section>
     </aside>
 
@@ -123,13 +143,13 @@
       </div>
         </section>
 
-        <section class="container" id="firebase-courses">
+    <!---<section class="container" id="firebase-courses">
           <div class="section-head">
             <h3>Courses from Firebase</h3>
             <p>Live catalog</p>
           </div>
           <div id="coursesContainer" class="firebase-course-grid" aria-live="polite"></div>
-        </section>
+        </section>--->
 
         <section class="container">
       <div class="section-head">
