@@ -24,6 +24,7 @@ const settingsUserName = document.getElementById("settingsUserName");
 const settingsEmail = document.getElementById("settingsEmail");
 const settingsRole = document.getElementById("settingsRole");
 const settingsDepartment = document.getElementById("settingsDepartment");
+const settingsAccessLevel = document.getElementById("settingsAccessLevel");
 const settingsCurrentPassword = document.getElementById("settingsCurrentPassword");
 const settingsNewPassword = document.getElementById("settingsNewPassword");
 const settingsConfirmPassword = document.getElementById("settingsConfirmPassword");
@@ -56,12 +57,22 @@ function isValidCorporateEmail(value) {
 
 function toFriendlyAuthError(errorCode) {
   switch (errorCode) {
+    case "auth/user-not-found":
+    case "auth/wrong-password":
     case "auth/invalid-credential":
       return "Invalid email or password.";
     case "auth/invalid-email":
       return "Please enter a valid work email address.";
     case "auth/user-disabled":
       return "Your account has been disabled. Contact an administrator.";
+    case "auth/network-request-failed":
+      return "Network issue while connecting to Firebase. Check your internet connection and try again.";
+    case "auth/operation-not-allowed":
+      return "Email/password sign-in is not enabled in your Firebase Authentication settings.";
+    case "auth/unauthorized-domain":
+      return "This domain is not authorized in Firebase Authentication. Add it in your Firebase console authorized domains.";
+    case "auth/invalid-api-key":
+      return "Firebase API key is invalid. Verify your project configuration in firebase.js.";
     case "auth/too-many-requests":
       return "Too many attempts. Please wait and try again.";
     case "auth/email-already-in-use":
@@ -222,6 +233,7 @@ function applyPortalProfile(user, profileData) {
   if (settingsEmail) settingsEmail.value = email !== "-" ? email : "";
   if (settingsRole) settingsRole.value = role !== "Team Member" ? role : "";
   if (settingsDepartment) settingsDepartment.value = department !== "Not specified" ? department : "";
+  if (settingsAccessLevel) settingsAccessLevel.value = accessLevel !== "Standard Learner" ? accessLevel : "";
 }
 
 async function loadPortalProfile(api, user) {
@@ -277,11 +289,6 @@ async function setupLoginPage(api) {
 
     if (!isValidCorporateEmail(email)) {
       setMessage("Please enter a valid work email address.");
-      return;
-    }
-
-    if (password.length < 8) {
-      setMessage("Password must be at least 8 characters.");
       return;
     }
 
@@ -366,8 +373,9 @@ function setupPortalSettings(api) {
 
     const requestedUserName = settingsUserName?.value.trim() ?? "";
     const requestedEmailRaw = settingsEmail?.value.trim() ?? "";
-  const requestedRole = settingsRole?.value.trim() ?? "";
-  const requestedDepartment = settingsDepartment?.value.trim() ?? "";
+    const requestedRole = settingsRole?.value.trim() ?? "";
+    const requestedDepartment = settingsDepartment?.value.trim() ?? "";
+    const requestedAccessLevel = settingsAccessLevel?.value.trim() ?? "";
     const requestedEmail = requestedEmailRaw.toLowerCase();
     const currentPassword = settingsCurrentPassword?.value ?? "";
     const newPassword = settingsNewPassword?.value ?? "";
@@ -417,7 +425,7 @@ function setupPortalSettings(api) {
         name: activePortalProfile?.name || requestedUserName,
         role: requestedRole || activePortalProfile?.role || "Learner",
         department: requestedDepartment || activePortalProfile?.department || "Not specified",
-        accessLevel: activePortalProfile?.accessLevel || "Standard Learner",
+        accessLevel: requestedAccessLevel || activePortalProfile?.accessLevel || "Standard Learner",
         lastLogin: new Date().toISOString()
       });
 
@@ -429,7 +437,8 @@ function setupPortalSettings(api) {
         userName: requestedUserName,
         name: activePortalProfile?.name || requestedUserName,
         role: requestedRole || activePortalProfile?.role || "Learner",
-        department: requestedDepartment || activePortalProfile?.department || "Not specified"
+        department: requestedDepartment || activePortalProfile?.department || "Not specified",
+        accessLevel: requestedAccessLevel || activePortalProfile?.accessLevel || "Standard Learner"
       };
 
       applyPortalProfile(activePortalUser, activePortalProfile);

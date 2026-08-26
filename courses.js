@@ -70,10 +70,21 @@ async function loadCourses() {
         const videoId = getYouTubeVideoId(rawVideo);
         const videoUrl = videoId ? `https://www.youtube.com/watch?v=${videoId}` : rawVideo;
         const videoPreview = videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : "";
+        const metadataTabsHtml = `
+          <div class="firebase-course-meta">
+            <span class="badge">Level: ${escapeHtml(course.level ?? "N/A")}</span>
+            <span class="badge">Duration: ${escapeHtml(course.duration ?? "N/A")}</span>
+            <span class="badge">Instructor: ${escapeHtml(course.instructor ?? "N/A")}</span>
+            <span class="badge">Status: ${escapeHtml(courseStatus)}</span>
+            <span class="badge">Modules: ${escapeHtml(String(course.totalModules ?? "N/A"))}</span>
+            <span class="badge">Added: ${escapeHtml(createdAtText)}</span>
+          </div>
+        `;
         const videoPreviewHtml = videoPreview
           ? `<a class="course-video-link" href="${escapeHtml(videoUrl)}" target="_blank" rel="noopener noreferrer">
               <div class="course-video-preview">
                 <img src="${escapeHtml(videoPreview)}" alt="Video thumbnail for ${escapeHtml(course.title ?? "course video")}" />
+                <div class="video-meta-overlay">${metadataTabsHtml}</div>
                 <div class="video-overlay"><span>Watch Intro</span></div>
               </div>
             </a>`
@@ -86,14 +97,7 @@ async function loadCourses() {
           <h4>${escapeHtml(course.title ?? "Untitled Course")}</h4>
           ${videoPreviewHtml}
           <p>${escapeHtml(course.description ?? "No description provided.")}</p>
-          <div class="firebase-course-meta">
-            <span class="badge">Level: ${escapeHtml(course.level ?? "N/A")}</span>
-            <span class="badge">Duration: ${escapeHtml(course.duration ?? "N/A")}</span>
-            <span class="badge">Instructor: ${escapeHtml(course.instructor ?? "N/A")}</span>
-            <span class="badge">Status: ${escapeHtml(courseStatus)}</span>
-            <span class="badge">Modules: ${escapeHtml(String(course.totalModules ?? "N/A"))}</span>
-            <span class="badge">Added: ${escapeHtml(createdAtText)}</span>
-          </div>
+          ${videoPreview ? "" : metadataTabsHtml}
         `;
 
         container.appendChild(card);
