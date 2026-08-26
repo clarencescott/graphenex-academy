@@ -1,72 +1,399 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>GrapheneX Academy Access</title>
-  <meta name="description" content="Secure access portal for GrapheneX Academy staff learning platform." />
-  <link rel="stylesheet" href="auth.css" />
-  <script type="module" src="firebase.js"></script>
-</head>
-<body>
-  <div class="auth-bg-layer" aria-hidden="true"></div>
-
-  <main class="auth-shell">
-    <section class="auth-panel" aria-labelledby="authTitle">
-      <p class="eyebrow">Secure Staff Access</p>
-      <h1 id="authTitle">Welcome to GrapheneX Academy</h1>
-      <p class="auth-subcopy">Sign in to continue your learning path, track completion, and access personalized recommendations.</p>
-
-      <div class="auth-tabs" role="tablist" aria-label="Authentication options">
-        <button id="loginTabBtn" class="auth-tab active" role="tab" aria-selected="true" aria-controls="loginPanel" type="button">Login</button>
-        <button id="signupTabBtn" class="auth-tab" role="tab" aria-selected="false" aria-controls="signupPanel" type="button">Sign Up</button>
-      </div>
-
-      <section id="loginPanel" class="auth-panel-section" role="tabpanel" aria-labelledby="loginTabBtn">
-        <form id="accessForm" class="auth-form" novalidate>
-          <label for="email">Work Email</label>
-          <input id="email" name="email" type="email" autocomplete="email" placeholder="name@graphenex.com" required />
-
-          <label for="password">Password</label>
-          <input id="password" name="password" type="password" autocomplete="current-password" placeholder="Enter your password" minlength="8" required />
-
-          <div class="auth-options">
-            <label class="remember-option">
-              <input id="rememberMe" type="checkbox" />
-              Remember me on this device
-            </label>
-            <a href="#" aria-disabled="true">Forgot password?</a>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GrapheneX | Carbon-grade, by design.</title>
+    <meta name="description" content="GrapheneX cybersecurity awareness training platform." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="theme-graphene">
+    <div class="site-shell">
+      <header class="glass-bar">
+        <div class="container-shell topbar-inner">
+          <div class="topbar-left">
+            <div class="brandmark-shell" aria-label="GrapheneX logo">
+              <svg class="brand-hex" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 1.5L19.5 6v12L12 22.5 4.5 18V6L12 1.5z" fill="none" stroke="currentColor" stroke-width="1.5"/>
+                <path d="M7.5 8.4L12 5.7l4.5 2.7v7.2L12 18.3l-4.5-2.7V8.4z" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.8"/>
+                <path d="M8 16.8L16 7.2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                <path d="M8 7.2L16 16.8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div class="brand-word" aria-label="GrapheneX brand">
+              <span>Graphene</span><span class="accent-x">X</span>
+            </div>
+            <div class="mono-label hidden-mobile topbar-badge">Security Awareness Training</div>
           </div>
 
-          <button type="submit" class="btn btn-primary">Sign In</button>
-        </form>
+          <nav class="nav-links hidden-mobile" aria-label="Main navigation">
+            <a href="#approach">01 // Approach</a>
+            <a href="#intelligence">02 // Intelligence</a>
+            <a href="#protocol">03 // Protocol</a>
+          </nav>
 
-        <p id="authMessage" class="auth-message" role="status" aria-live="polite"></p>
-      </section>
+          <a class="primary-btn" href="#protocol">Start Training</a>
+        </div>
+      </header>
 
-      <section id="signupPanel" class="signup-section auth-panel-section hidden-panel" aria-labelledby="signupTitle" role="tabpanel" aria-hidden="true">
-        <h2 id="signupTitle">Create your account</h2>
-        <form id="signupForm" class="auth-form" novalidate>
-          <label for="signupName">Full Name</label>
-          <input id="signupName" name="signupName" type="text" autocomplete="name" placeholder="Jane Doe" required />
+      <main>
+        <section class="hero-wrap" aria-labelledby="hero-title">
+          <div class="data-grid layer-grid" aria-hidden="true"></div>
+          <div class="container-shell hero-grid">
+            <div class="hero-copy">
+              <div class="hero-label mono-label">
+                <span>GrapheneX // Lattice Active</span>
+                <span class="dot"></span>
+              </div>
+              <h1 id="hero-title" class="hero-h1">Your strongest <span class="text-gradient">perimeter</span> is your people.</h1>
+              <p class="hero-subcopy">Turn every employee into a living layer of defense — one that spots phishing, hardens passwords, and reads social engineering before it gets a chance to land.</p>
 
-          <label for="signupEmail">Work Email</label>
-          <input id="signupEmail" name="signupEmail" type="email" autocomplete="email" placeholder="name@graphenex.com" required />
+              <div class="hero-actions">
+                <a class="secondary-btn" href="#protocol">Start Training</a>
+                <a class="outline-btn" href="#approach">View Modules</a>
+              </div>
 
-          <label for="signupPassword">Create Password</label>
-          <input id="signupPassword" name="signupPassword" type="password" autocomplete="new-password" minlength="8" placeholder="At least 8 characters" required />
+              <div class="hero-metrics">
+                <div class="metric-box">
+                  <strong>94%</strong>
+                  <span>Breaches start with a human click</span>
+                </div>
+                <div class="metric-box">
+                  <strong>4 min</strong>
+                  <span>Avg. time to spot a phish</span>
+                </div>
+                <div class="metric-box">
+                  <strong>0</strong>
+                  <span>Real clicks after training</span>
+                </div>
+              </div>
+            </div>
 
-          <label for="signupConfirmPassword">Confirm Password</label>
-          <input id="signupConfirmPassword" name="signupConfirmPassword" type="password" autocomplete="new-password" minlength="8" placeholder="Re-enter your password" required />
+            <div class="hero-visual" aria-hidden="true">
+              <div class="crystal-scene" id="crystalScene">
+                <div class="lattice-figure">
+                  <div class="hex-frame">
+                    <div class="hex-core">
+                      <div class="lattice-node node-a"></div>
+                      <div class="lattice-node node-b"></div>
+                      <div class="lattice-node node-c"></div>
+                      <div class="lattice-node node-d"></div>
+                      <div class="lattice-node node-e"></div>
+                      <div class="lattice-node node-f"></div>
+                      <div class="lattice-node node-g"></div>
+                      <div class="lattice-node node-h"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="glass-chip chip-top-left">Phish Reported Live</div>
+              <div class="glass-chip chip-bottom-right">1,240 Lures Deployed</div>
+            </div>
+          </div>
 
-          <button type="submit" class="btn">Register / Sign Up</button>
-        </form>
-        <p id="signupMessage" class="auth-message" role="status" aria-live="polite"></p>
-      </section>
-    </section>
-  </main>
+          <div class="scroll-cue mono-label">
+            <span>Scroll</span>
+            <div class="line"></div>
+          </div>
+        </section>
 
-  <script src="auth.js"></script>
+        <section class="section-shell" id="approach">
+          <div class="container-shell approach-grid">
+            <div>
+              <div class="section-header">
+                <div class="mono-label">01 // Approach</div>
+                <h2>Train the layer hackers target most.</h2>
+              </div>
+            </div>
 
-</body>
+            <div class="approach-copy">
+              <p class="lead">Breaches start with human decisions, not just infrastructure. GrapheneX turns awareness into instinct — building the reflexes that catch suspicious patterns before they become operational risk.</p>
+              <p>Every pulse of training, every live simulation, and every role-specific drill is designed to move behavior from passive compliance into active defense.</p>
+
+              <div class="feature-grid">
+                <div class="feature-cell">
+                  <h3>Experiential</h3>
+                  <p>Hands-on scenarios built from real attack paths and everyday triggers.</p>
+                </div>
+                <div class="feature-cell">
+                  <h3>Adaptive</h3>
+                  <p>Performance data sharpens each next lesson around weak signals and drift.</p>
+                </div>
+                <div class="feature-cell">
+                  <h3>Measurable</h3>
+                  <p>Clear proof of response quality, mastery maturity, and risk reduction.</p>
+                </div>
+                <div class="feature-cell">
+                  <h3>Continuous</h3>
+                  <p>Micro-learning loops keep instinct fresh without friction or fatigue.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section-shell" id="intelligence">
+          <div class="container-shell">
+            <div class="matrix-top">
+              <div>
+                <div class="mono-label">02 // Intelligence</div>
+                <h2>The Awareness Matrix</h2>
+              </div>
+              <div class="carousel-buttons">
+                <button class="icon-button" type="button" aria-label="Scroll left">?</button>
+                <button class="icon-button" type="button" aria-label="Scroll right">?</button>
+              </div>
+            </div>
+
+            <div class="no-scrollbar matrix-scroll">
+              <article class="matrix-card refraction-hover">
+                <div class="matrix-visual">
+                  <svg viewBox="0 0 72 72" aria-hidden="true">
+                    <path d="M16 48L36 18L56 48"/>
+                    <path d="M36 18V54"/>
+                    <path d="M21 40H51"/>
+                  </svg>
+                </div>
+                <div class="matrix-card-header">
+                  <h3>Phishing</h3>
+                  <span class="card-index">01</span>
+                </div>
+                <p>Realistic lures in inboxes turn reaction into recognition, reporting, and rapid recovery.</p>
+                <div class="matrix-card-footer"><span>Pane 01</span><span>04</span></div>
+              </article>
+
+              <article class="matrix-card refraction-hover">
+                <div class="matrix-visual">
+                  <svg viewBox="0 0 72 72" aria-hidden="true">
+                    <circle cx="24" cy="24" r="4"/>
+                    <circle cx="48" cy="24" r="4"/>
+                    <circle cx="24" cy="48" r="4"/>
+                    <circle cx="48" cy="48" r="4"/>
+                    <path d="M12 36H60"/>
+                    <path d="M36 12V60"/>
+                  </svg>
+                </div>
+                <div class="matrix-card-header">
+                  <h3>Password Safety</h3>
+                  <span class="card-index">02</span>
+                </div>
+                <p>Build the habit of entropy, MFA, and controlled credential hygiene before exposure.</p>
+                <div class="matrix-card-footer"><span>Pane 02</span><span>04</span></div>
+              </article>
+
+              <article class="matrix-card refraction-hover">
+                <div class="matrix-visual">
+                  <svg viewBox="0 0 72 72" aria-hidden="true">
+                    <circle cx="36" cy="36" r="12"/>
+                    <circle cx="36" cy="36" r="20"/>
+                    <circle cx="36" cy="36" r="28"/>
+                  </svg>
+                </div>
+                <div class="matrix-card-header">
+                  <h3>Public-Use Defense</h3>
+                  <span class="card-index">03</span>
+                </div>
+                <p>Model the quick checks that matter when people work in public, on mobile, and across shared surfaces.</p>
+                <div class="matrix-card-footer"><span>Pane 03</span><span>04</span></div>
+              </article>
+
+              <article class="matrix-card refraction-hover">
+                <div class="matrix-visual">
+                  <svg viewBox="0 0 72 72" aria-hidden="true">
+                    <path d="M18 18L54 54"/>
+                    <path d="M54 18L18 54"/>
+                    <path d="M36 10V62"/>
+                    <path d="M10 36H62"/>
+                  </svg>
+                </div>
+                <div class="matrix-card-header">
+                  <h3>Social Engineering</h3>
+                  <span class="card-index">04</span>
+                </div>
+                <p>Pretexting, impersonation, and baiting are trained as instinctive suspicion patterns.</p>
+                <div class="matrix-card-footer"><span>Pane 04</span><span>04</span></div>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <section class="section-shell" aria-labelledby="proof-title">
+          <div class="container-shell">
+            <div class="section-header">
+              <div class="mono-label">03 // Live Proof</div>
+              <h2 id="proof-title">Pulse of your workforce.</h2>
+            </div>
+
+            <div class="pulse-panel">
+              <div class="pulse-stage scan-line">
+                <img class="pulse-image" src="https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?auto=format&fit=crop&w=1200&q=80" alt="Graphene dashboard proof" />
+                <div class="live-badge"><span class="live-dot"></span> Live</div>
+                <button class="hotspot h1" type="button" aria-label="Simulated phish hotspot"></button>
+                <button class="hotspot h2" type="button" aria-label="Learner mastery hotspot"></button>
+                <button class="hotspot h3" type="button" aria-label="Report don't click hotspot"></button>
+                <button class="hotspot h4" type="button" aria-label="Compliance pulse hotspot"></button>
+
+                <div class="ticker-wrap" aria-label="Live training metrics">
+                  <div class="ticker-track">
+                    <span>Phish Reported // Sales</span>
+                    <span>Click-Thru 2.1%</span>
+                    <span>MFA Adoption 98%</span>
+                    <span>Mastery Drift 0.002</span>
+                    <span>Module Complete // Legal</span>
+                    <span>Phish Reported // Sales</span>
+                    <span>Click-Thru 2.1%</span>
+                    <span>MFA Adoption 98%</span>
+                    <span>Mastery Drift 0.002</span>
+                    <span>Module Complete // Legal</span>
+                  </div>
+                </div>
+              </div>
+
+              <aside class="detail-panel">
+                <div class="mono-label">Hotspot Detail</div>
+                <div class="detail-display">
+                  <div class="icon-wrap">
+                    <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5L18 5v6.3c0 4.2-2.9 8.5-6 9.7-3.1-1.2-6-5.5-6-9.7V5l6-1.5z" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+                  </div>
+                  <h4>Simulated Phish</h4>
+                  <p>Human-first defense improves when the risky path is clearly surfaced and coached in the moment.</p>
+                </div>
+
+                <div class="hotspot-list">
+                  <button class="hotspot-item active" type="button">
+                    <span class="hotspot-meta"><span class="hotspot-dot"></span><span class="hotspot-name">Simulated Phish</span></span>
+                    <span>92%</span>
+                  </button>
+                  <button class="hotspot-item" type="button">
+                    <span class="hotspot-meta"><span class="hotspot-dot"></span><span class="hotspot-name">Learner Mastery</span></span>
+                    <span>87%</span>
+                  </button>
+                  <button class="hotspot-item" type="button">
+                    <span class="hotspot-meta"><span class="hotspot-dot"></span><span class="hotspot-name">Report Don't Click</span></span>
+                    <span>98%</span>
+                  </button>
+                  <button class="hotspot-item" type="button">
+                    <span class="hotspot-meta"><span class="hotspot-dot"></span><span class="hotspot-name">Compliance Pulse</span></span>
+                    <span>100%</span>
+                  </button>
+                </div>
+              </aside>
+            </div>
+          </div>
+        </section>
+
+        <section class="section-shell" id="protocol">
+          <div class="container-shell">
+            <div class="protocol-card glass-panel">
+              <div class="data-grid protocol-grid" aria-hidden="true"></div>
+              <div class="protocol-inner">
+                <div class="mono-label">Initiate Protocol</div>
+                <h2>Describe your team's <span class="text-gradient">training goals.</span></h2>
+
+                <form class="protocol-form" id="landingSignupForm">
+                  <div class="protocol-input-row">
+                    <input type="text" placeholder="Describe your team's training goals…" aria-label="Describe your team's training goals" />
+                    <button class="submit-circle" type="submit" aria-label="Submit training goal">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </button>
+                  </div>
+                </form>
+
+                <div class="protocol-footer mono-label">End-to-End Encrypted // Zero Retention</div>
+                <div class="transmission-success" id="transmissionSuccess">Transmission received — Your goals have entered the program…</div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer class="site-footer">
+        <div class="container-shell">
+          <div class="footer-grid">
+            <div>
+              <div class="footer-brand">
+                <div class="brandmark-shell" aria-label="GrapheneX footer mark">
+                  <svg class="brand-hex" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M12 1.5L19.5 6v12L12 22.5 4.5 18V6L12 1.5z" fill="none" stroke="currentColor" stroke-width="1.5"/>
+                    <path d="M7.5 8.4L12 5.7l4.5 2.7v7.2L12 18.3l-4.5-2.7V8.4z" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.8"/>
+                    <path d="M8 16.8L16 7.2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    <path d="M8 7.2L16 16.8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                  </svg>
+                </div>
+                <div class="brand-word" aria-label="GrapheneX brand">
+                  <span>Graphene</span><span class="accent-x">X</span>
+                </div>
+              </div>
+              <div class="footer-copy">GrapheneX — carbon-grade cybersecurity awareness training. A hex lattice of human defense: phishing, passwords, public use, and the social-engineering layer.</div>
+            </div>
+
+            <div>
+              <div class="mono-label footer-title">Navigate</div>
+              <div class="footer-links">
+                <a href="#approach">Approach</a>
+                <a href="#intelligence">Intelligence</a>
+                <a href="#protocol">Protocol</a>
+              </div>
+            </div>
+
+            <div>
+              <div class="mono-label footer-title">Contact</div>
+              <div class="footer-links">
+                <a href="mailto:contact@graphenex.io">contact@graphenex.io</a>
+                <div class="footer-meta mono-label">Operational // UTC <span id="year"></span> // SOC-2 / ISO 27001</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="footer-bottom">
+            <div>© <span id="footerYear"></span> GrapheneX. Carbon-grade, by design.</div>
+            <div class="footer-pages">
+              <span>Privacy</span>
+              <span>Terms</span>
+              <span>Security</span>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <script>
+      const scene = document.getElementById('crystalScene');
+      if (scene) {
+        const applyTilt = (event) => {
+          const rect = scene.getBoundingClientRect();
+          const x = (event.clientX - rect.left) / rect.width;
+          const y = (event.clientY - rect.top) / rect.height;
+          const rotateY = (x - 0.5) * 18;
+          const rotateX = (0.5 - y) * 18;
+          scene.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+        };
+
+        scene.addEventListener('pointermove', applyTilt);
+        scene.addEventListener('pointerleave', () => {
+          scene.style.transform = 'rotateX(0deg) rotateY(0deg)';
+        });
+      }
+
+      const currentYear = new Date().getFullYear();
+      const yearNode = document.getElementById('year');
+      const footerYearNode = document.getElementById('footerYear');
+      if (yearNode) yearNode.textContent = currentYear;
+      if (footerYearNode) footerYearNode.textContent = currentYear;
+
+      const landingForm = document.getElementById('landingSignupForm');
+      const transmissionCard = document.getElementById('transmissionSuccess');
+      if (landingForm) {
+        landingForm.addEventListener('submit', (event) => {
+          event.preventDefault();
+          if (transmissionCard) {
+            transmissionCard.classList.add('show');
+          }
+        });
+      }
+    </script>
+  </body>
 </html>

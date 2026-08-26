@@ -146,6 +146,55 @@ function setupAuthTabs() {
   signupTabBtn.addEventListener("click", () => setActiveAuthTab("signup"));
 }
 
+function setupAuthModal() {
+  const openAuthBtn = document.getElementById("openAuthBtn");
+  const authModal = document.getElementById("authModal");
+  const closeButtons = document.querySelectorAll("[data-close-modal]");
+  const navAuthButtons = document.querySelectorAll("[data-auth-mode]");
+
+  if (!authModal) {
+    return;
+  }
+
+  const toggleModal = (visible) => {
+    authModal.classList.toggle("hidden-panel", !visible);
+    authModal.setAttribute("aria-hidden", String(!visible));
+    if (visible) {
+      document.body.style.overflow = "hidden";
+      const firstField = document.querySelector("#email");
+      firstField?.focus();
+    } else {
+      document.body.style.overflow = "";
+    }
+  };
+
+  const openModalForMode = (mode) => {
+    setActiveAuthTab(mode);
+    toggleModal(true);
+  };
+
+  if (openAuthBtn) {
+    openAuthBtn.addEventListener("click", () => openModalForMode("login"));
+  }
+
+  navAuthButtons.forEach((button) => {
+    const mode = button.dataset.authMode === "signup" ? "signup" : "login";
+    button.addEventListener("click", () => openModalForMode(mode));
+  });
+
+  closeButtons.forEach((button) => button.addEventListener("click", () => toggleModal(false)));
+  authModal.addEventListener("click", (event) => {
+    if (event.target === authModal) {
+      toggleModal(false);
+    }
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && !authModal.classList.contains("hidden-panel")) {
+      toggleModal(false);
+    }
+  });
+}
+
 function applyPortalProfile(user, profileData) {
   if (!profileName && !profileRole && !profileEmail && !profileDepartment && !profileAccessLevel) {
     return;
@@ -421,11 +470,12 @@ function setupPortalSignOut(api) {
 (async () => {
   try {
     const api = await waitForFirebaseAuthApi();
-  setupAuthTabs();
+    setupAuthTabs();
+    setupAuthModal();
     await protectDashboardRoute(api);
     await setupLoginPage(api);
     setupSignupPage(api);
-  setupPortalSettings(api);
+    setupPortalSettings(api);
     setupPortalSignOut(api);
   } catch (error) {
     setMessage("Authentication is unavailable. Please refresh and try again.");

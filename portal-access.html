@@ -1,214 +1,558 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>GrapheneX Academy</title>
-  <meta name="description" content="Immersive staff learning portal for IT, Cybersecurity, Office365, and company-specific tools." />
-  <link rel="stylesheet" href="styles.css" />
-  <script type="module" src="firebase.js"></script>
-</head>
-<body>
-  <div id="pageLoader" class="page-loader" role="status" aria-live="polite" aria-label="Loading GrapheneX Academy">
-    <div class="page-loader-inner">
-      <video id="loaderVideo" class="loader-video" autoplay muted playsinline preload="auto">
-        <source src="GrapheneX Academy - intro Video.mp4" type="video/mp4" />
-      </video>
-      <p class="loader-text">Loading GrapheneX Academy...</p>
-    </div>
-  </div>
-
-  <div class="bg-layer"></div>
-
-  <div class="app-shell">
-    <aside id="profileSidebar" class="profile-sidebar card" aria-label="User profile sidebar">
-      <button id="sidebarClose" class="sidebar-close btn btn-ghost" type="button" aria-label="Close profile sidebar">Ã—</button>
-      <div class="profile-head">
-        <img src="profile-avatar.svg" alt="User profile avatar" class="profile-avatar" />
-        <div>
-          <p class="eyebrow">Learner Profile</p>
-          <h2 id="profileName" class="profile-name">Loading profile...</h2>
-          <p id="profileRole" class="profile-role">Loading role...</p>
-        </div>
-      </div>
-
-      <nav class="profile-nav" aria-label="Profile navigation">
-        <a href="#dashboard" data-sidebar-nav>Dashboard</a>
-        <a href="#modules" data-sidebar-nav>Learning Modules</a>
-        <a href="#recommendations" data-sidebar-nav>Recommendations</a>
-        <a href="#sidebarSettings" data-sidebar-nav>Settings</a>
-        <a href="#sidebarAccount" data-sidebar-nav>Account Info</a>
-      </nav>
-
-      <section id="sidebarSettings" class="sidebar-block">
-        <h3>Settings</h3>
-        <form id="accountSettingsForm" class="settings-form" novalidate>
-          <label for="settingsUserName">Username</label>
-          <input id="settingsUserName" type="text" placeholder="Choose your username" />
-
-          <label for="settingsEmail">Email</label>
-          <input id="settingsEmail" type="email" placeholder="name@company.com" />
-
-          <label for="settingsRole">Role</label>
-          <input id="settingsRole" type="text" placeholder="e.g. Developer" />
-
-          <label for="settingsDepartment">Department</label>
-          <input id="settingsDepartment" type="text" placeholder="e.g. Engineering" />
-
-          <label for="settingsCurrentPassword">Current Password</label>
-          <input id="settingsCurrentPassword" type="password" autocomplete="current-password" placeholder="Required for email/password updates" />
-
-          <label for="settingsNewPassword">New Password</label>
-          <input id="settingsNewPassword" type="password" autocomplete="new-password" placeholder="Leave blank to keep current password" />
-
-          <label for="settingsConfirmPassword">Confirm New Password</label>
-          <input id="settingsConfirmPassword" type="password" autocomplete="new-password" placeholder="Re-enter new password" />
-
-          <button id="saveSettingsBtn" class="btn" type="submit">Save Settings</button>
-        </form>
-        <p id="settingsMessage" class="settings-message" role="status" aria-live="polite"></p>
-      </section>
-
-      <section id="sidebarAccount" class="sidebar-block">
-        <h3>Account Info</h3>
-        <p><strong>Email:</strong> <span id="profileEmail">-</span></p>
-        <p><strong>Department:</strong> <span id="profileDepartment">-</span></p>
-        <p><strong>Access Level:</strong> <span id="profileAccessLevel">-</span></p>
-      </section>
-    </aside>
-
-    <div class="app-main">
-      <header class="site-header">
-        <nav class="nav container">
-          <div class="brand">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GrapheneX | Learner Portal</title>
+    <meta name="description" content="GrapheneX learner portal for staff enablement, mini games, and training catalog." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="theme-graphene-light">
+    <div class="portal-shell">
+      <header class="glass-bar portal-topbar">
+        <div class="container-shell portal-topbar-inner">
+          <div class="profile-card">
+            <div class="profile-avatar-box" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 12C14.7614 12 17 9.76142 17 7C17 4.23858 14.7614 2 12 2C9.23858 2 7 4.23858 7 7C7 9.76142 9.23858 12 12 12Z" fill="currentColor" opacity="0.85"/>
+                <path d="M4 20C4 16.6863 6.68629 14 10 14H14C17.3137 14 20 16.6863 20 20V22H4V20Z" fill="currentColor" opacity="0.64"/>
+              </svg>
+            </div>
             <div>
-              <h1>GrapheneX Academy</h1>
-              <p>Empowering People. Securing Tomorrow.</p>
+              <p>LEARNER PROFILE</p>
+              <h3>Alex Mercer — Security Analyst</h3>
             </div>
           </div>
-          <div class="top-actions">
-            <button id="sidebarToggle" class="btn" type="button" aria-controls="profileSidebar" aria-expanded="false">Profile Menu</button>
-            <button id="resetProgressBtn" class="btn btn-ghost" type="button">Reset Progress</button>
-            <button id="signOutBtn" class="btn" type="button">Sign Out</button>
+
+          <div class="portal-actions">
+            <button class="ghost-btn" type="button">Profile Menu</button>
+            <button class="ghost-btn" type="button">Reset Progress</button>
+            <button class="primary-btn" type="button">Sign Out</button>
           </div>
-        </nav>
+        </div>
       </header>
+
       <main>
-        <section id="dashboard" class="hero container">
-      <div class="hero-copy">
-        <p class="eyebrow">Staff Enablement Platform</p>
-        <h2>Master IT, Cybersecurity, Office365, and Internal Tools</h2>
-        <p>
-          Explore focused modules, complete quick checkpoints, and track your growth in one immersive learning workspace.
-        </p>
-        <div class="hero-actions">
-          <a href="#modules" class="btn btn-primary">Start Learning</a>
-          <button id="jumpToRecommendations" class="btn" type="button">My Next Best Module</button>
-        </div>
-      </div>
-      <div class="hero-stats card">
-        <h3>Learning Progress</h3>
-        <div class="progress-wrap" aria-label="Overall progress">
-          <div id="overallProgressBar" class="progress-bar"></div>
-        </div>
-        <p id="overallProgressText">0% completed</p>
-        <div class="stat-grid">
-          <div>
-            <strong id="completedCount">0</strong>
-            <span>Completed</span>
+        <section class="portal-hero">
+          <div class="container-shell portal-hero-grid">
+            <div>
+              <div class="mono-label">Staff Enablement Platform</div>
+              <h1>Master IT, Cybersecurity, Office365, and <span class="text-gradient">Internal Tools.</span></h1>
+              <p class="portal-subcopy">Hands-on drills, role-based practice, and targeted coaching that build reflexes instead of slide-deck memory.</p>
+
+              <div class="portal-actions-row">
+                <button class="secondary-btn" type="button">Start Learning</button>
+                <button class="outline-btn" type="button">My Next Best Module</button>
+              </div>
+            </div>
+
+            <div class="progress-card">
+              <div class="progress-header">
+                <span class="mono-label">Learning Progress</span>
+                <span class="mono-label">0% COMPLETED</span>
+              </div>
+              <div class="progress-track" aria-label="Learning progress">
+                <div class="progress-fill"></div>
+              </div>
+              <span class="mono-label state-label">0% Completed</span>
+
+              <div class="progress-stats">
+                <div class="progress-stat">
+                  <strong>0</strong>
+                  <span>Completed</span>
+                </div>
+                <div class="progress-stat">
+                  <strong>8</strong>
+                  <span>Remaining</span>
+                </div>
+                <div class="progress-stat">
+                  <strong>Beginner</strong>
+                  <span>Avg Difficulty</span>
+                </div>
+              </div>
+            </div>
           </div>
-          <div>
-            <strong id="remainingCount">0</strong>
-            <span>Remaining</span>
-          </div>
-          <div>
-            <strong id="avgDifficulty">-</strong>
-            <span>Avg Difficulty</span>
-          </div>
-        </div>
-      </div>
         </section>
 
-        <section class="controls container" id="modules">
-      <div class="search-box card">
-        <label for="searchInput">Search topics, skills, or tools</label>
-        <input id="searchInput" type="search" placeholder="Try: phishing, Excel, endpoint management..." />
-      </div>
-      <div class="filters card" role="group" aria-label="Category filters">
-        <button class="chip active" data-filter="all" type="button">All</button>
-        <button class="chip" data-filter="it" type="button">IT</button>
-        <button class="chip" data-filter="cybersecurity" type="button">Cybersecurity</button>
-        <button class="chip" data-filter="office365" type="button">Office365</button>
-        <button class="chip" data-filter="company-tools" type="button">Company Tools</button>
-      </div>
-        </section>
-
-        <section class="container" id="firebase-courses">
-          <div class="section-head">
-            <h3>Courses from Firebase</h3>
-            <p>Live catalog</p>
+        <section class="mini-games-section">
+          <div class="container-shell">
+            <div id="miniGamesRoot"></div>
           </div>
-          <div id="coursesContainer" class="firebase-course-grid" aria-live="polite"></div>
         </section>
 
-      <!---<section class="container">
-      <div class="section-head">
-        <h3>Learning Modules</h3>
-        <p id="resultCount">0 modules</p>
-      </div>
-      <div id="moduleGrid" class="module-grid" aria-live="polite"></div>
-        </section>-->
+        <section class="catalog-panel">
+          <div class="container-shell">
+            <div class="catalog-tools">
+              <div class="search-shell glass-panel">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M21 21L16.65 16.65M18 10.5C18 14.6421 14.6421 18 10.5 18C6.35786 18 3 14.6421 3 10.5C3 6.35786 6.35786 3 10.5 3C14.6421 3 18 6.35786 18 10.5Z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+                <input type="search" placeholder="Try phishing, Excel, endpoint management…" aria-label="Search trainings" />
+              </div>
+            </div>
 
-        <section class="container spotlight" id="recommendations">
-      <div class="card recommendation-card">
-        <h3>Recommended Next Module</h3>
-        <p id="recommendedText">Complete a module to unlock personalized recommendations.</p>
-        <button id="openRecommendation" class="btn btn-primary" type="button" disabled>Open Module</button>
-      </div>
+            <div class="filter-row" aria-label="Training filters">
+              <button class="filter-chip active" type="button">All</button>
+              <button class="filter-chip" type="button">IT</button>
+              <button class="filter-chip" type="button">Cybersecurity</button>
+              <button class="filter-chip" type="button">Office365</button>
+              <button class="filter-chip" type="button">Company Tools</button>
+            </div>
+
+            <div class="catalog-head">
+              <h3>Available Trainings</h3>
+              <a href="#">Live catalog ?</a>
+            </div>
+
+            <div class="catalog-grid">
+              <article class="course-card refraction-hover">
+                <div class="course-thumb">Phishing Defense</div>
+                <div>
+                  <h4>Phishing Defense</h4>
+                  <p>Build fast recognition for spoofed senders, urgency tactics, and risky links.</p>
+                  <div class="course-info">
+                    <span class="info-badge"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M12 2L15.5 8.5L22 9.5L17 14L18.5 20.5L12 17.2L5.5 20.5L7 14L2 9.5L8.5 8.5L12 2Z" stroke="currentColor" stroke-width="1.3" fill="none"/></svg> Beginner</span>
+                    <span class="info-badge"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M12 7V12L16 14" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.4"/></svg> 12 min</span>
+                  </div>
+                  <button class="learn-btn" type="button">Learn</button>
+                </div>
+              </article>
+
+              <article class="course-card refraction-hover">
+                <div class="course-thumb">Endpoint Hygiene</div>
+                <div>
+                  <h4>Endpoint Hygiene</h4>
+                  <p>Cover safe updates, patch discipline, and device-level risk controls.</p>
+                  <div class="course-info">
+                    <span class="info-badge"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M12 2L15.5 8.5L22 9.5L17 14L18.5 20.5L12 17.2L5.5 20.5L7 14L2 9.5L8.5 8.5L12 2Z" stroke="currentColor" stroke-width="1.3" fill="none"/></svg> Intermediate</span>
+                    <span class="info-badge"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M12 7V12L16 14" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.4"/></svg> 18 min</span>
+                  </div>
+                  <button class="learn-btn" type="button">Learn</button>
+                </div>
+              </article>
+
+              <article class="course-card refraction-hover">
+                <div class="course-thumb">Excel Security</div>
+                <div>
+                  <h4>Excel Security</h4>
+                  <p>Reduce exposure in spreadsheets, file sharing, and permission management.</p>
+                  <div class="course-info">
+                    <span class="info-badge"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M12 2L15.5 8.5L22 9.5L17 14L18.5 20.5L12 17.2L5.5 20.5L7 14L2 9.5L8.5 8.5L12 2Z" stroke="currentColor" stroke-width="1.3" fill="none"/></svg> Beginner</span>
+                    <span class="info-badge"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M12 7V12L16 14" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.4"/></svg> 10 min</span>
+                  </div>
+                  <button class="learn-btn" type="button">Learn</button>
+                </div>
+              </article>
+
+              <article class="course-card refraction-hover">
+                <div class="course-thumb">ITSM Basics</div>
+                <div>
+                  <h4>ITSM Basics</h4>
+                  <p>Understand tickets, approvals, change control, and service accountability.</p>
+                  <div class="course-info">
+                    <span class="info-badge"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M12 2L15.5 8.5L22 9.5L17 14L18.5 20.5L12 17.2L5.5 20.5L7 14L2 9.5L8.5 8.5L12 2Z" stroke="currentColor" stroke-width="1.3" fill="none"/></svg> Intermediate</span>
+                    <span class="info-badge"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M12 7V12L16 14" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.4"/></svg> 15 min</span>
+                  </div>
+                  <button class="learn-btn" type="button">Learn</button>
+                </div>
+              </article>
+            </div>
+          </div>
         </section>
       </main>
-
-      <footer class="site-footer">
-        <div class="container">
-          <p>Â© <span id="year"></span> GrapheneX Academy â€¢ Built for staff development and secure operations.</p>
-        </div>
-      </footer>
     </div>
-  </div>
 
-  <div id="moduleModal" class="modal hidden" aria-hidden="true" role="dialog" aria-labelledby="modalTitle">
-    <div class="modal-panel card">
-      <button id="closeModal" class="close-btn" aria-label="Close module details" type="button">Ã—</button>
-      <p id="modalCategory" class="eyebrow"></p>
-      <h3 id="modalTitle"></h3>
-      <p id="modalDescription"></p>
+    <script>
+      const games = [
+        { id: 'phish', title: 'Phish or Legit', icon: 'Fish', duration: '~3 min', tag: 'CYBERSECURITY', blurb: 'Spot the phishing lures hiding in your inbox.' },
+        { id: 'password', title: 'Password Forge', icon: 'KeyRound', duration: '~2 min', tag: 'CYBERSECURITY', blurb: 'Build a fortress-grade password from security blocks.' },
+        { id: 'reflex', title: 'Reflex Pulse', icon: 'Zap', duration: '~2 min', tag: 'CYBERSECURITY', blurb: 'Rapid-fire true/false security instincts check.' }
+      ];
 
-      <div class="modal-meta">
-        <span id="modalDuration"></span>
-        <span id="modalDifficulty"></span>
-        <span id="modalToolset"></span>
-      </div>
+      const phishEmails = [
+        {
+          sender: 'alerts@secure-bank.io',
+          subject: 'Urgent account verification required',
+          body: 'Your account access has been suspended due to a security review. Confirm your credentials immediately to avoid interruption.',
+          isPhish: true,
+          explanation: 'This message creates urgency and asks for immediate action without context. A real institution will not pressure you to log in via a generic email link.'
+        },
+        {
+          sender: 'payroll@company.com',
+          subject: 'Payroll summary available',
+          body: 'Your April payroll summary is now available in the secure payroll portal. Review the document from your approved work dashboard.',
+          isPhish: false,
+          explanation: 'This is a routine business message from a known internal source with a trusted workflow and no deceptive urgency.'
+        },
+        {
+          sender: 'support@dropbox-team.com',
+          subject: 'Storage quota exceeded — action required',
+          body: 'You are over your storage limit and need to reauthorize access to prevent file loss. Click here to restore service.',
+          isPhish: true,
+          explanation: 'The sender domain is slightly off-brand and the call to action is designed to trigger quick action without verification.'
+        },
+        {
+          sender: 'noreply@microsoft.com',
+          subject: 'Multi-factor authentication required',
+          body: 'We have detected a new sign-in on your account. Review this authentication prompt in your managed portal before continuing.',
+          isPhish: false,
+          explanation: 'The message references a legitimate security flow and directs the user to an expected channel rather than a suspicious link.'
+        },
+        {
+          sender: 'hr-benefits@portal-update.net',
+          subject: 'Open enrollment ends tonight',
+          body: 'Open enrollment closes today. Renew your elections before midnight or your plan will default to the standard selection.',
+          isPhish: true,
+          explanation: 'This message is designed to create a deadline panic while using an unfamiliar sender domain and generic enrollment language.'
+        }
+      ];
 
-      <div>
-        <h4>Key Lessons</h4>
-        <ul id="lessonList"></ul>
-      </div>
+      const reflexStatements = [
+        { text: 'A password manager reduces the risk of reuse across accounts.', isTrue: true },
+        { text: 'A message asking you to log in from an unexpected email is usually safe.', isTrue: false },
+        { text: 'MFA blocks most credential-based account takeovers.', isTrue: true },
+        { text: 'You should click urgent links in random security alerts without checking the sender.', isTrue: false },
+        { text: 'Reporting a suspicious email is safer than clicking a link inside it.', isTrue: true }
+      ];
 
-      <div class="quiz-box">
-        <h4>Quick Check</h4>
-        <p id="quizQuestion"></p>
-        <div id="quizOptions" class="quiz-options"></div>
-        <p id="quizFeedback" class="quiz-feedback"></p>
-      </div>
+      const passwordBlocks = [
+        { id: 'short-word', title: 'Short word', note: 'Easily cracked', score: 0, icon: 'A' },
+        { id: 'passphrase', title: 'Passphrase', note: 'Length is strength', score: 25, icon: 'P' },
+        { id: 'symbols', title: 'Add symbols', note: 'Adds entropy', score: 25, icon: '#' },
+        { id: 'mfa', title: 'Enable MFA', note: 'Stops 99% of account takeovers', score: 50, icon: 'M' }
+      ];
 
-      <div class="modal-actions">
-        <button id="markCompleteBtn" class="btn btn-primary" type="button">Mark as Completed</button>
-      </div>
-    </div>
-  </div>
+      const miniGamesRoot = document.getElementById('miniGamesRoot');
+      let selectedGame = null;
 
-  <script type="module" src="courses.js"></script>
-  <script src="script.js"></script>
-  <script src="auth.js"></script>
-</body>
+      function renderHub() {
+        const hub = `
+          <div class="mini-games-header">
+            <div>
+              <div class="mono-label">Mini Games</div>
+              <h2>Interactive Drills</h2>
+            </div>
+          </div>
+          <div class="game-grid">
+            ${games.map(game => `
+              <article class="game-card refraction-hover" data-game-id="${game.id}">
+                <div class="game-head">
+                  <div class="game-icon-box">${renderGameIcon(game.icon)}</div>
+                  <span class="mono-label game-duration">${game.duration}</span>
+                </div>
+                <div class="mono-label game-tag">${game.tag}</div>
+                <h3>${game.title}</h3>
+                <p>${game.blurb}</p>
+                <button class="play-link" type="button" data-game-id="${game.id}">Play now ?</button>
+              </article>
+            `).join('')}
+          </div>
+        `;
+
+        miniGamesRoot.innerHTML = hub;
+        document.querySelectorAll('[data-game-id]').forEach((button) => {
+          button.addEventListener('click', (event) => {
+            const targetId = event.currentTarget.getAttribute('data-game-id');
+            selectedGame = targetId;
+            renderGame();
+          });
+        });
+      }
+
+      function renderGameIcon(iconName) {
+        const icons = {
+          Fish: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M6 12C6 8.68629 8.68629 6 12 6C15.3137 6 18 8.68629 18 12C18 15.3137 15.3137 18 12 18C8.68629 18 6 15.3137 6 12ZM12 4V8M12 16V20M4 12H8M16 12H20" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M10.5 9.5L13.5 14.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>',
+          KeyRound: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="8" cy="15" r="4" stroke="currentColor" stroke-width="1.6"/><path d="M10.5 15H20V18H17.5V20" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M12.5 15L18 9.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>',
+          Zap: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M13 2L4 13H9.5L8 22L20 10H14.5L16 2H13Z" fill="currentColor"/></svg>'
+        };
+        return icons[iconName] || icons.Zap;
+      }
+
+      function renderGame() {
+        if (!selectedGame) {
+          renderHub();
+          return;
+        }
+
+        if (selectedGame === 'phish') {
+          renderPhishGame();
+          return;
+        }
+
+        if (selectedGame === 'password') {
+          renderPasswordGame();
+          return;
+        }
+
+        renderReflexGame();
+      }
+
+      function renderPhishGame() {
+        let currentIndex = 0;
+        let correct = 0;
+        let answered = false;
+
+        const root = document.createElement('div');
+        root.className = 'game-shell';
+
+        const render = () => {
+          if (currentIndex >= phishEmails.length) {
+            root.innerHTML = `
+              <div class="game-shell-header">
+                <button class="back-link" type="button" data-back="games">? All mini games</button>
+                <div class="score-badge">Score: ${correct}</div>
+              </div>
+              <div class="results-panel">
+                <div class="trophy"><svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M8 4H16V7C16 10.3137 13.3137 13 10 13H8V4ZM8 4H6V7H8M16 4H18V7H16M8 20H16M10 16V20M14 16V20M12 13C15.3137 13 18 10.3137 18 7V4H20V7C20 12.5228 15.5228 17 10 17H8V7H10C13.3137 7 16 9.68629 16 13V13Z" fill="currentColor"/></svg></div>
+                <h3>${correct} / 5 correct</h3>
+                <p>${correct >= 4 ? 'Strong instincts — your pattern detection is holding up.' : correct >= 3 ? 'Solid discipline — a few more reflex checks will sharpen the signal.' : 'A few of these look risky—repeat and sharpen the pattern recognition.'}</p>
+                <div class="results-actions">
+                  <button class="secondary-btn" type="button" data-replay="phish">Play again</button>
+                  <button class="outline-btn" type="button" data-back="games">Back to mini games</button>
+                </div>
+              </div>
+            `;
+            attachResultHandlers();
+            return;
+          }
+
+          const email = phishEmails[currentIndex];
+          root.innerHTML = `
+            <div class="game-shell-header">
+              <button class="back-link" type="button" data-back="games">? All mini games</button>
+              <div class="score-badge">Score: ${correct}</div>
+            </div>
+            <div class="game-stage">
+              <div class="mono-label">Email ${currentIndex + 1} / 5</div>
+              <div class="email-meta">From</div>
+              <div class="email-sender">${email.sender}</div>
+              <div class="email-subject">${email.subject}</div>
+              <p class="email-body">${email.body}</p>
+              <div class="answer-row">
+                <button class="answer-btn safe" type="button" data-answer="safe">${renderCheckIcon()} Safe</button>
+                <button class="answer-btn report" type="button" data-answer="report">${renderAlertIcon()} Report Phish</button>
+              </div>
+              <div class="coaching-card ${answered ? 'show' : ''} ${email.isPhish ? 'correct' : 'missed'}" id="phishCoach">
+                <div class="coaching-head">${email.isPhish ? renderCheckIcon() : renderAlertIcon()}<span>${email.isPhish ? 'Correct' : 'Missed'}</span></div>
+                <div>${email.explanation}</div>
+                <button class="next-btn" type="button" data-next="phish">Next ?</button>
+              </div>
+            </div>
+          `;
+
+          const safeBtn = root.querySelector('[data-answer="safe"]');
+          const reportBtn = root.querySelector('[data-answer="report"]');
+          const coachingCard = root.querySelector('#phishCoach');
+          const answerButtons = [safeBtn, reportBtn];
+
+          answerButtons.forEach((btn) => {
+            btn.addEventListener('click', () => {
+              if (answered) return;
+              answered = true;
+              const isCorrect = (btn.dataset.answer === 'report' && email.isPhish) || (btn.dataset.answer === 'safe' && !email.isPhish);
+              if (isCorrect) correct += 1;
+
+              coachingCard.classList.add(isCorrect ? 'correct' : 'missed');
+              coachingCard.classList.add('show');
+              coachingCard.innerHTML = `
+                <div class="coaching-head">${isCorrect ? renderCheckIcon() : renderAlertIcon()}<span>${isCorrect ? 'Correct' : 'Missed'}</span></div>
+                <div>${email.explanation}</div>
+                <button class="next-btn" type="button" data-next="phish">Next ?</button>
+              `;
+
+              coachingCard.querySelector('[data-next="phish"]').addEventListener('click', () => {
+                currentIndex += 1;
+                answered = false;
+                render();
+              });
+            });
+          });
+
+          root.querySelector('[data-back="games"]').addEventListener('click', () => {
+            selectedGame = null;
+            renderGame();
+          });
+        };
+
+        render();
+        miniGamesRoot.innerHTML = '';
+        miniGamesRoot.appendChild(root);
+      }
+
+      function renderPasswordGame() {
+        const state = { selected: new Set(), score: 0 };
+        const root = document.createElement('div');
+        root.className = 'game-shell';
+
+        const render = () => {
+          const score = Array.from(state.selected).reduce((total, id) => {
+            const block = passwordBlocks.find((item) => item.id === id);
+            return total + (block ? block.score : 0);
+          }, 0);
+
+          const verdict = score === 0 ? 'Bare' : score < 25 ? 'Weak' : score < 50 ? 'Fair' : score < 100 ? 'Strong' : 'Fortress-grade';
+          root.innerHTML = `
+            <div class="game-shell-header">
+              <button class="back-link" type="button" data-back="games">? All mini games</button>
+              <button class="secondary-btn" type="button" data-reset="password">Reset</button>
+            </div>
+            <div class="game-stage password-meter">
+              <span class="verdict">${verdict}</span>
+              <div class="meter-bar"><div class="meter-fill" style="width:${score}%"></div></div>
+              <div class="block-grid">
+                ${passwordBlocks.map((block) => `
+                  <button class="block-btn ${state.selected.has(block.id) ? 'active' : ''}" type="button" data-block-id="${block.id}">
+                    <div>
+                      <div class="block-title">${renderSmallBadge(block.icon)} ${block.title}</div>
+                      <span class="block-note">${block.note}</span>
+                    </div>
+                    <span>+${block.score}</span>
+                  </button>
+                `).join('')}
+              </div>
+              <div class="toast ${score >= 100 ? 'show' : ''}">Fortress-grade — Your password layer is carbon-strong.</div>
+            </div>
+          `;
+
+          root.querySelectorAll('[data-block-id]').forEach((button) => {
+            button.addEventListener('click', () => {
+              const id = button.getAttribute('data-block-id');
+              if (state.selected.has(id)) state.selected.delete(id);
+              else state.selected.add(id);
+              render();
+            });
+          });
+
+          root.querySelector('[data-back="games"]').addEventListener('click', () => {
+            selectedGame = null;
+            renderGame();
+          });
+
+          root.querySelector('[data-reset="password"]').addEventListener('click', () => {
+            state.selected.clear();
+            render();
+          });
+        };
+
+        render();
+        miniGamesRoot.innerHTML = '';
+        miniGamesRoot.appendChild(root);
+      }
+
+      function renderReflexGame() {
+        let currentIndex = 0;
+        let correct = 0;
+        let streak = 0;
+        let best = 0;
+        const root = document.createElement('div');
+        root.className = 'game-shell';
+
+        const render = () => {
+          if (currentIndex >= reflexStatements.length) {
+            root.innerHTML = `
+              <div class="game-shell-header">
+                <button class="back-link" type="button" data-back="games">? All mini games</button>
+                <div class="score-badge">Best streak: ${best}</div>
+              </div>
+              <div class="results-panel">
+                <div class="trophy"><svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M7 4H17V8C17 11.3137 14.3137 14 11 14H10C6.68629 14 4 11.3137 4 8V4H7ZM7 4H5V7H7M17 4H19V7H17M8 20H16M10 16V20M14 16V20M14 14H10C6.68629 14 4 16.6863 4 20V20H20V20C20 16.6863 17.3137 14 14 14Z" fill="currentColor"/></svg></div>
+                <h3>${correct} / 5</h3>
+                <p>${correct >= 4 ? 'Excellent recall — your instincts are sharp.' : correct >= 3 ? 'Good reaction time — a quick review will close the gap.' : 'Speed is improving — repeat the drill and lock in the pattern.'}</p>
+                <div class="results-actions">
+                  <button class="secondary-btn" type="button" data-replay="reflex">Play again</button>
+                  <button class="outline-btn" type="button" data-back="games">Back to mini games</button>
+                </div>
+              </div>
+            `;
+            attachResultHandlers();
+            return;
+          }
+
+          const statement = reflexStatements[currentIndex];
+          root.innerHTML = `
+            <div class="game-shell-header">
+              <button class="back-link" type="button" data-back="games">? All mini games</button>
+              <div class="score-badge">Best streak: ${best}</div>
+            </div>
+            <div class="game-stage reflex-stage">
+              <div class="mono-label">${currentIndex + 1} / 5</div>
+              <div class="statement">${statement.text}</div>
+              <div class="reflex-buttons">
+                <button class="reflex-btn" type="button" data-answer="true">True</button>
+                <button class="reflex-btn" type="button" data-answer="false">False</button>
+              </div>
+            </div>
+          `;
+
+          root.querySelectorAll('[data-answer]').forEach((button) => {
+            button.addEventListener('click', () => {
+              const answer = button.dataset.answer === 'true';
+              const isCorrect = answer === statement.isTrue;
+              if (isCorrect) {
+                correct += 1;
+                streak += 1;
+                best = Math.max(best, streak);
+                button.classList.add('correct');
+              } else {
+                streak = 0;
+                button.classList.add('wrong');
+              }
+
+              setTimeout(() => {
+                currentIndex += 1;
+                render();
+              }, 550);
+            });
+          });
+
+          root.querySelector('[data-back="games"]').addEventListener('click', () => {
+            selectedGame = null;
+            renderGame();
+          });
+        };
+
+        render();
+        miniGamesRoot.innerHTML = '';
+        miniGamesRoot.appendChild(root);
+      }
+
+      function attachResultHandlers() {
+        miniGamesRoot.querySelectorAll('[data-back="games"]').forEach((button) => {
+          button.addEventListener('click', () => {
+            selectedGame = null;
+            renderGame();
+          });
+        });
+
+        miniGamesRoot.querySelectorAll('[data-replay="phish"]').forEach((button) => {
+          button.addEventListener('click', () => {
+            selectedGame = 'phish';
+            renderGame();
+          });
+        });
+
+        miniGamesRoot.querySelectorAll('[data-replay="reflex"]').forEach((button) => {
+          button.addEventListener('click', () => {
+            selectedGame = 'reflex';
+            renderGame();
+          });
+        });
+      }
+
+      function renderCheckIcon() {
+        return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 12.5L9.5 17L19 7.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+      }
+
+      function renderAlertIcon() {
+        return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 3L21 19H3L12 3Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M12 9V13" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="12" cy="16.5" r="1" fill="currentColor"/></svg>';
+      }
+
+      function renderSmallBadge(value) {
+        return `<span class="mini-badge">${value}</span>`;
+      }
+
+      renderHub();
+    </script>
+  </body>
 </html>

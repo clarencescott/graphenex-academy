@@ -334,7 +334,7 @@ function buildAdditionalModules(targetTotal, existingModules) {
   return additional;
 }
 
-const modules = [...baseModules, ...buildAdditionalModules(50, baseModules)];
+const modules = [...baseModules];
 
 const STORAGE_KEY = "cyberbyte-learning-progress";
 
@@ -480,9 +480,9 @@ function renderModules() {
 
 function updateStats() {
   const completed = state.completedIds.size;
-  const total = modules.length;
+  const total = getTotalCourseCount();
   const remaining = Math.max(total - completed, 0);
-  const percent = total ? Math.round((completed / total) * 100) : 0;
+  const percent = total ? Math.round((Math.min(completed, total) / total) * 100) : 0;
 
   el.overallProgressBar.style.width = `${percent}%`;
   el.overallProgressText.textContent = `${percent}% completed`;
@@ -511,6 +511,14 @@ function averageDifficulty() {
   if (average < 1.5) return "Beginner";
   if (average < 2.5) return "Intermediate";
   return "Advanced";
+}
+
+function getTotalCourseCount() {
+  if (Array.isArray(window.firebaseCourses) && window.firebaseCourses.length > 0) {
+    return window.firebaseCourses.length;
+  }
+
+  return 0;
 }
 
 function formatCategory(category) {
@@ -798,11 +806,12 @@ function wireEvents() {
   });
 }
 
-function init() {
+async function init() {
   setupPageLoader();
   hideProfileMenuDetails();
   el.year.textContent = new Date().getFullYear();
   wireEvents();
+  await (window.firebaseCoursesReady ?? Promise.resolve());
   updateStats();
   renderModules();
   renderRecommendation();
