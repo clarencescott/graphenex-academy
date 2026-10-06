@@ -3,12 +3,14 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <base href="/" />
     <title>GrapheneX | Learner Portal</title>
     <meta name="description" content="GrapheneX learner portal for staff enablement, mini games, and training catalog." />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="styles.css" />
+    <script src="tenant.js"></script>
     <style>
       .settings-drawer.hidden-panel {
         display: none;
@@ -188,10 +190,17 @@
       .firebase-course-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(235px, 1fr));
+        grid-auto-rows: minmax(370px, 1fr);
         gap: 0.75rem;
+        align-items: stretch;
       }
 
       .firebase-course-card {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        height: 100%;
+        min-width: 0;
         border: 1px solid rgba(255, 255, 255, 0.14);
         border-radius: 14px;
         background: rgba(255, 255, 255, 0.06);
@@ -202,6 +211,7 @@
         margin: 0;
         font-size: 0.93rem;
         line-height: 1.25;
+        min-height: 2.5em;
       }
 
       .firebase-course-card p {
@@ -209,61 +219,39 @@
         font-size: 0.8rem;
         line-height: 1.38;
         margin: 0.45rem 0 0.4rem;
-      }
-
-      .firebase-course-meta {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.3rem;
-        margin-top: 0;
-      }
-
-      .firebase-course-meta .badge {
-        display: inline-flex;
-        align-items: center;
-        white-space: nowrap;
-        background: rgba(8, 5, 18, 0.78);
-        color: rgba(255, 255, 255, 0.98);
-        border: 1px solid rgba(166, 232, 244, 0.44);
-        border-radius: 999px;
-        padding: 0.14rem 0.42rem;
-        font-size: 0.63rem;
-        font-weight: 600;
-        line-height: 1.08;
+        display: -webkit-box;
+        overflow: hidden;
+        -webkit-box-orient: vertical;
+        line-clamp: 3;
+        -webkit-line-clamp: 3;
+        min-height: calc(3 * 1.38em);
       }
 
       .course-video-link {
         display: block;
-        margin: 0.44rem 0 0.48rem;
+        margin: 0.5rem 0;
         text-decoration: none;
       }
 
       .course-video-preview {
         position: relative;
+        aspect-ratio: 16 / 9;
         border-radius: 9px;
         overflow: hidden;
       }
 
-      .video-meta-overlay {
-        position: absolute;
-        inset: 0.42rem auto auto 0.42rem;
-        z-index: 2;
-        max-width: calc(100% - 0.84rem);
-      }
-
-      .video-meta-overlay .firebase-course-meta {
-        gap: 0.26rem;
-      }
-
-      .video-meta-overlay .firebase-course-meta .badge {
-        background: rgba(12, 7, 26, 0.84);
-        border-color: rgba(135, 227, 243, 0.55);
-        backdrop-filter: blur(2px);
-      }
-
       .course-video-preview img {
         width: 100%;
+        height: 100%;
         display: block;
+        object-fit: cover;
+      }
+
+      .course-video-placeholder {
+        aspect-ratio: 16 / 9;
+        margin: 0.5rem 0;
+        border-radius: 9px;
+        background: rgba(8, 5, 18, 0.35);
       }
 
       .video-overlay {
@@ -275,11 +263,227 @@
         font-size: 0.72rem;
       }
 
+      .course-duration {
+        margin-top: 0;
+        color: rgba(255, 255, 255, 0.82);
+        font-size: 0.76rem;
+      }
+
       .empty-state {
         border: 1px dashed rgba(255, 255, 255, 0.25);
         border-radius: 12px;
         padding: 0.8rem;
         color: rgba(255, 255, 255, 0.86);
+      }
+
+      .course-card-actions {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 0.55rem;
+        margin-top: 0.4rem;
+      }
+
+      .course-start-button,
+      .course-quiz-toggle,
+      .course-quiz-submit {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: 0;
+        border-radius: 999px;
+        padding: 0.48rem 0.8rem;
+        background: linear-gradient(135deg, #22d3ee, #0ea5c9);
+        color: #fff;
+        font: inherit;
+        font-size: 0.75rem;
+        font-weight: 700;
+        cursor: pointer;
+        text-decoration: none;
+      }
+
+      .course-start-button:disabled {
+        cursor: not-allowed;
+        opacity: 0.55;
+      }
+
+      .course-quiz-submit:disabled {
+        cursor: wait;
+        opacity: 0.7;
+      }
+
+      .course-completed-badge {
+        color: #9af4df;
+        font-size: 0.75rem;
+        font-weight: 700;
+      }
+
+      .course-completed-badge[hidden] {
+        display: none;
+      }
+
+      .course-quiz-modal {
+        width: min(92vw, 560px);
+        max-height: min(86vh, 720px);
+        overflow: auto;
+        padding: 1.25rem;
+        border: 1px solid rgba(166, 232, 244, 0.38);
+        border-radius: 18px;
+        background: linear-gradient(180deg, rgba(23, 13, 41, 0.99), rgba(16, 9, 31, 0.99));
+        color: #f8f6ff;
+        box-shadow: 0 24px 80px rgba(0, 0, 0, 0.55);
+      }
+
+      .course-quiz-modal::backdrop {
+        background: rgba(5, 3, 12, 0.76);
+        backdrop-filter: blur(5px);
+      }
+
+      .course-quiz-modal-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-bottom: 1rem;
+      }
+
+      .course-quiz-modal-header h2 {
+        margin: 0;
+        font-size: 1.15rem;
+      }
+
+      .course-quiz-modal-close {
+        flex: 0 0 auto;
+        width: 2rem;
+        height: 2rem;
+        border: 1px solid rgba(255, 255, 255, 0.28);
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.1);
+        color: inherit;
+        font-size: 1.1rem;
+        cursor: pointer;
+      }
+
+      .course-quiz-modal-content {
+        padding: 0.9rem;
+        border: 1px solid rgba(166, 232, 244, 0.28);
+        border-radius: 12px;
+        background: rgba(8, 5, 18, 0.42);
+      }
+
+      .course-quiz-form fieldset {
+        min-width: 0;
+        margin: 0;
+        padding: 0;
+        border: 0;
+      }
+
+      .course-quiz-form legend {
+        margin-bottom: 0.55rem;
+        font-size: 0.85rem;
+        font-weight: 700;
+      }
+
+      .course-quiz-option {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.45rem;
+        margin: 0.35rem 0;
+        font-size: 0.78rem;
+      }
+
+      .course-quiz-option input {
+        margin-top: 0.25rem;
+      }
+
+      .course-quiz-count,
+      .course-quiz-message,
+      .course-quiz-result {
+        margin: 0 0 0.55rem;
+        font-size: 0.78rem;
+      }
+
+      .course-quiz-count {
+        color: rgba(255, 255, 255, 0.72);
+      }
+
+      .master-dashboard[hidden] {
+        display: none;
+      }
+
+      .master-dashboard {
+        padding: 1.5rem 0;
+      }
+
+      .master-dashboard-panel {
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        border-radius: 18px;
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.06);
+      }
+
+      .master-dashboard-header {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+        gap: 0.8rem;
+      }
+
+      .master-dashboard-header h2 {
+        margin: 0;
+      }
+
+      .master-dashboard-stats {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        margin: 0.8rem 0;
+      }
+
+      .master-dashboard-stat {
+        min-width: 140px;
+        padding: 0.7rem 0.85rem;
+        border: 1px solid rgba(166, 232, 244, 0.25);
+        border-radius: 12px;
+        background: rgba(8, 5, 18, 0.3);
+      }
+
+      .master-dashboard-stat strong,
+      .master-dashboard-stat span {
+        display: block;
+      }
+
+      .master-dashboard-stat strong {
+        font-size: 1.35rem;
+      }
+
+      .master-dashboard-message {
+        min-height: 1.4em;
+        margin: 0.5rem 0;
+        font-size: 0.82rem;
+      }
+
+      .master-dashboard-table-wrap {
+        overflow-x: auto;
+      }
+
+      .master-dashboard-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.82rem;
+        text-align: left;
+      }
+
+      .master-dashboard-table th,
+      .master-dashboard-table td {
+        padding: 0.65rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+        vertical-align: top;
+      }
+
+      .master-dashboard-table th {
+        color: #9aeef8;
       }
     </style>
   </head>
@@ -407,6 +611,44 @@
           </div>
         </section>
 
+        <section id="masterDashboard" class="master-dashboard" aria-labelledby="masterDashboardTitle" hidden>
+          <div class="container-shell">
+            <div class="master-dashboard-panel">
+              <div class="master-dashboard-header">
+                <div>
+                  <div class="mono-label">Administrator View</div>
+                  <h2 id="masterDashboardTitle">Learner Progress</h2>
+                </div>
+                <button id="masterRefreshButton" class="secondary-btn" type="button">Refresh Users</button>
+              </div>
+              <div class="master-dashboard-stats" aria-live="polite">
+                <div class="master-dashboard-stat">
+                  <strong id="masterUserCount">0</strong>
+                  <span>Learners</span>
+                </div>
+                <div class="master-dashboard-stat">
+                  <strong id="masterCompletionCount">0</strong>
+                  <span>Course completions</span>
+                </div>
+              </div>
+              <p id="masterDashboardMessage" class="master-dashboard-message" role="status" aria-live="polite"></p>
+              <div class="master-dashboard-table-wrap">
+                <table class="master-dashboard-table">
+                  <thead>
+                    <tr>
+                      <th scope="col">Learner</th>
+                      <th scope="col">Email</th>
+                      <th scope="col">Completed</th>
+                     <!--- <th scope="col">Completed Courses</th> -->
+                    </tr>
+                  </thead>
+                  <tbody id="masterUsersBody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
         <section class="mini-games-section">
           <div class="container-shell">
             <div id="miniGamesRoot"></div>
@@ -441,6 +683,14 @@
         </section>
       </main>
     </div>
+
+    <dialog id="courseQuizModal" class="course-quiz-modal" aria-labelledby="courseQuizModalTitle">
+      <div class="course-quiz-modal-header">
+        <h2 id="courseQuizModalTitle">Course Quiz</h2>
+        <button id="courseQuizModalClose" class="course-quiz-modal-close" type="button" aria-label="Close quiz">×</button>
+      </div>
+      <div id="courseQuizModalContent" class="course-quiz-modal-content"></div>
+    </dialog>
 
     <script>
       const games = [
@@ -875,25 +1125,12 @@
           return;
         }
 
-        const getStoredCompletionIds = () => {
-          try {
-            const raw = localStorage.getItem("cyberbyte-learning-progress");
-            const parsed = JSON.parse(raw || "[]");
-            if (!Array.isArray(parsed)) return [];
-            return parsed
-              .map((value) => String(value || "").trim())
-              .filter(Boolean);
-          } catch {
-            return [];
-          }
-        };
-
         const getCompletedCountForCourses = (courses) => {
           if (!Array.isArray(courses) || !courses.length) {
             return 0;
           }
 
-          const completedIds = new Set(getStoredCompletionIds());
+          const completedIds = new Set(Array.isArray(window.courseCompletionIds) ? window.courseCompletionIds : []);
           if (!completedIds.size) {
             return 0;
           }
@@ -905,6 +1142,16 @@
         };
 
         const applyProgress = (liveCourses) => {
+          if (window.courseProgressError) {
+            progressPercentLabel.textContent = "Unavailable";
+            progressStateLabel.textContent = "Unable to load course progress";
+            completedTrainingsCount.textContent = "-";
+            remainingTrainingsCount.textContent = "-";
+            progressFillBar.style.width = "0%";
+            avgDifficultyLabel.textContent = "-";
+            return;
+          }
+
           const safeCourses = Array.isArray(liveCourses) ? liveCourses : [];
           const safeTotal = safeCourses.length;
           const completed = getCompletedCountForCourses(safeCourses);
@@ -920,6 +1167,8 @@
           avgDifficultyLabel.textContent = safeTotal ? "Live Catalog" : "-";
         };
 
+        document.addEventListener("course-progress-updated", () => applyProgress(getLiveCourses()));
+
         const getLiveCourses = () => (Array.isArray(window.firebaseCourses) ? window.firebaseCourses : []);
 
         const wait = (ms) => new Promise((resolve) => window.setTimeout(resolve, ms));
@@ -933,7 +1182,8 @@
               try {
                 const courses = await readyPromise;
                 applyProgress(Array.isArray(courses) ? courses : getLiveCourses());
-              } catch {
+              } catch (error) {
+                console.error("Unable to calculate course progress:", error);
                 applyProgress(getLiveCourses());
               }
               return;

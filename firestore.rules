@@ -1,0 +1,121 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function userRecordPath(uid) {
+      return /databases/$(database)/documents/users/$(uid);
+    }
+
+    function isAdmin() {
+      return signedIn()
+        && exists(userRecordPath(request.auth.uid))
+        && get(userRecordPath(request.auth.uid)).data.get('admin', false) == true;
+    }
+
+    function isCompanyAdmin(companyId) {
+      return signedIn()
+        && exists(userRecordPath(request.auth.uid))
+        && get(userRecordPath(request.auth.uid)).data.get('admin', false) == true
+        && get(userRecordPath(request.auth.uid)).data.get('companyId', '') == companyId;
+    }
+
+    function uidMatchesPath(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
+    function uidMatchesResource() {
+      return signedIn() &&
+        (
+          resource.data.get('uid', '') == request.auth.uid ||
+          resource.data.get('userId', '') == request.auth.uid
+        );
+    }
+
+    function uidMatchesRequest() {
+      return signedIn() &&
+        (
+          request.resource.data.get('uid', '') == request.auth.uid ||
+          request.resource.data.get('userId', '') == request.auth.uid
+        );
+    }
+
+    function requestKeepsUserIdentity() {
+      return (
+          !request.resource.data.keys().hasAny(['uid'])
+          || request.resource.data.get('uid', '') == request.auth.uid
+        )
+        && (
+          !request.resource.data.keys().hasAny(['userId'])
+          || request.resource.data.get('userId', '') == request.auth.uid
+        );
+    }
+
+    function userKeepsAdminAndCompany() {
+      return request.resource.data.get('admin', false) == resource.data.get('admin', false)
+        && request.resource.data.get('companyId', '') == resource.data.get('companyId', '');
+    }
+
+    match /profiles/{docId} {
+      allow get: if isCompanyAdmin(resource.data.get('companyId', ''))
+        || uidMatchesPath(docId)
+        || uidMatchesResource();
+
+      allow list: if isCompanyAdmin(resource.data.get('companyId', ''))
+        || uidMatchesResource();
+
+      allow create: if uidMatchesPath(docId)
+        && uidMatchesRequest();
+
+      allow update: if (
+          isCompanyAdmin(resource.data.get('companyId', ''))
+          && request.resource.data.get('companyId', '') == resource.data.get('companyId', '')
+        )
+        || (
+          (uidMatchesPath(docId) || uidMatchesResource())
+          && requestKeepsUserIdentity()
+          && userKeepsAdminAndCompany()
+        );
+
+      allow delete: if false;
+    }
+
+    match /users/{docId} {
+      allow get: if isCompanyAdmin(resource.data.get('companyId', ''))
+        || uidMatchesPath(docId)
+        || uidMatchesResource();
+
+      allow list: if isCompanyAdmin(resource.data.get('companyId', ''))
+        || uidMatchesResource();
+
+      allow create: if uidMatchesPath(docId)
+        && uidMatchesRequest()
+        && request.resource.data.get('admin', false) == false;
+
+      allow update: if (
+          isCompanyAdmin(resource.data.get('companyId', ''))
+          && request.resource.data.get('companyId', '') == resource.data.get('companyId', '')
+        )
+        || (
+          (uidMatchesPath(docId) || uidMatchesResource())
+          && requestKeepsUserIdentity()
+          && userKeepsAdminAndCompany()
+        );
+
+      allow delete: if false;
+    }
+
+    match /courses/{courseId} {
+      allow read: if signedIn();
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

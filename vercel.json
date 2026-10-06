@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/:company/portal",
+      "destination": "/portal-access.html"
+    },
+    {
+      "source": "/:company",
+      "destination": "/index.html"
+    }
+  ]
+}

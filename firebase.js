@@ -1,5 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
 import {
+  arrayUnion,
   collection,
   doc,
   getDoc,
@@ -7,6 +8,7 @@ import {
   getFirestore,
   limit,
   query,
+  setDoc,
   where
 } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
 import {
@@ -23,7 +25,6 @@ import {
   updateEmail,
   updatePassword
 } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js";
-import { setDoc } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyD73BbOs1RK_7Op2Q9a7ihY0V_moPuimb8",
@@ -90,6 +91,32 @@ async function upsertUserProfile(uid, profileData) {
   if (!writes.some((result) => result.status === "fulfilled")) {
     const firstError = writes.find((result) => result.status === "rejected");
     throw firstError?.reason || new Error("Failed to update profile documents.");
+  }
+}
+
+async function recordCourseCompletion(courseId) {
+  const user = auth.currentUser;
+  const normalizedCourseId = String(courseId || "").trim();
+  if (!user?.uid) {
+    throw new Error("You must be signed in to save course progress.");
+  }
+  if (!normalizedCourseId) {
+    throw new Error("Missing course ID for progress update.");
+  }
+
+  const payload = {
+    completedCourseIds: arrayUnion(normalizedCourseId),
+    updatedAt: new Date().toISOString()
+  };
+  const writes = await Promise.allSettled(
+    ["users", "profiles"].map((collectionName) =>
+      setDoc(doc(db, collectionName, user.uid), payload, { merge: true })
+    )
+  );
+
+  if (!writes.some((result) => result.status === "fulfilled")) {
+    const firstError = writes.find((result) => result.status === "rejected");
+    throw firstError?.reason || new Error("Failed to save course progress.");
   }
 }
 
@@ -170,6 +197,71 @@ async function getUserProfileForAuthUser(user) {
   return null;
 }
 
+async function getAssignedCompanyId(user = auth.currentUser) {
+  if (!user?.uid) {
+    return "";
+  }
+
+  const userDocument = await getDoc(doc(db, "users", user.uid));
+  if (userDocument.exists()) {
+    return String(userDocument.data().companyId || "").trim();
+  }
+
+  const profileDocument = await getDoc(doc(db, "profiles", user.uid));
+  return profileDocument.exists()
+    ? String(profileDocument.data().companyId || "").trim()
+    : "";
+}
+
+async function isCompanyAdmin(companyId, user = auth.currentUser) {
+  const normalizedCompanyId = String(companyId || "").trim();
+  if (!user || !normalizedCompanyId) {
+    return false;
+  }
+
+  const userDocument = await getDoc(doc(db, "users", user.uid));
+  if (!userDocument.exists()) {
+    return false;
+  }
+  const userData = userDocument.data();
+  return userData.admin === true && userData.companyId === normalizedCompanyId;
+}
+
+async function getAllUserProgress(companyId) {
+  const user = auth.currentUser;
+  const normalizedCompanyId = String(companyId || "").trim();
+  if (!(await isCompanyAdmin(normalizedCompanyId, user))) {
+    throw new Error("Admin access for this company is required to view learner progress.");
+  }
+
+  const [usersSnapshot, profilesSnapshot] = await Promise.all([
+    getDocs(query(collection(db, "users"), where("companyId", "==", normalizedCompanyId))),
+    getDocs(query(collection(db, "profiles"), where("companyId", "==", normalizedCompanyId)))
+  ]);
+  const records = new Map();
+
+  const mergeSnapshot = (snapshot) => {
+    snapshot.forEach((userDoc) => {
+      const data = userDoc.data();
+      const uid = String(data.uid || userDoc.id).trim();
+      if (!uid) {
+        return;
+      }
+
+      records.set(uid, {
+        ...(records.get(uid) || {}),
+        ...data,
+        uid
+      });
+    });
+  };
+
+  mergeSnapshot(profilesSnapshot);
+  mergeSnapshot(usersSnapshot);
+
+  return Array.from(records.values());
+}
+
 window.grapheneAuth = {
   auth,
   login,
@@ -181,6 +273,9 @@ window.grapheneAuth = {
   observeAuthState,
   getUserProfileByUid,
   getUserProfileForAuthUser,
+  getAssignedCompanyId,
+  isCompanyAdmin,
+  getAllUserProgress,
+  recordCourseCompletion,
   getCurrentUser: () => auth.currentUser
 };
-

@@ -32,6 +32,7 @@ const settingsMessage = document.getElementById("settingsMessage");
 
 let activePortalUser = null;
 let activePortalProfile = null;
+let authFlowInProgress = false;
 
 function setMessage(text, success = false) {
   if (!authMessage) return;
@@ -55,6 +56,17 @@ function isValidCorporateEmail(value) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 }
 
+function getCompanyLandingPath() {
+  return window.companyPortal ? `/${window.companyPortal.slug}` : "index.html";
+}
+
+function getCompanyPortalPath(companyId) {
+  if (companyId) {
+    return window.getCompanyPortalPath?.(companyId) || null;
+  }
+  return window.companyPortal ? null : "portal-access.html";
+}
+
 function toFriendlyAuthError(errorCode) {
   switch (errorCode) {
     case "auth/user-not-found":
@@ -71,6 +83,8 @@ function toFriendlyAuthError(errorCode) {
       return "Email/password sign-in is not enabled in your Firebase Authentication settings.";
     case "auth/unauthorized-domain":
       return "This domain is not authorized in Firebase Authentication. Add it in your Firebase console authorized domains.";
+    case "permission-denied":
+      return "Your account was created, but Firestore blocked saving the profile. Check that the published rules allow a signed-in user to create their own users and profiles documents.";
     case "auth/invalid-api-key":
       return "Firebase API key is invalid. Verify your project configuration in firebase.js.";
     case "auth/too-many-requests":
@@ -251,13 +265,28 @@ async function loadPortalProfile(api, user) {
 }
 
 async function protectDashboardRoute(api) {
-  if (!window.location.pathname.toLowerCase().includes("portal-access.html")) {
+  const currentPath = window.location.pathname.toLowerCase();
+  const tenantPortalPath = window.companyPortal
+    ? `/${window.companyPortal.slug}/portal`.toLowerCase()
+    : "";
+  if (!currentPath.includes("portal-access.html") && currentPath !== tenantPortalPath) {
     return;
   }
 
   api.observeAuthState(async (user) => {
     if (!user) {
-      window.location.replace("index.html");
+      window.location.replace(getCompanyLandingPath());
+      return;
+    }
+
+    const assignedCompanyId = await api.getAssignedCompanyId(user);
+    if (window.companyPortal && assignedCompanyId !== window.companyPortal.id) {
+      const assignedPath = getCompanyPortalPath(assignedCompanyId);
+      if (assignedPath) {
+        window.location.replace(assignedPath);
+      } else {
+        window.location.replace("/");
+      }
       return;
     }
 
@@ -271,8 +300,23 @@ async function setupLoginPage(api) {
   }
 
   api.observeAuthState((user) => {
-    if (user) {
-      window.location.replace("portal-access.html");
+    if (user && !authFlowInProgress) {
+      void (async () => {
+        try {
+          const assignedCompanyId = await api.getAssignedCompanyId(user);
+          const destination = getCompanyPortalPath(assignedCompanyId);
+          if (destination) {
+            window.location.replace(destination);
+          } else if (window.companyPortal) {
+            setMessage("This account is not assigned to this organization. Contact your administrator.");
+          } else {
+            setMessage("This account does not have an assigned organization. Contact your administrator.");
+          }
+        } catch (error) {
+          console.error("Unable to determine the account's organization:", error);
+          setMessage("Unable to load your organization assignment. Please try again.");
+        }
+      })();
     }
   });
 
@@ -292,13 +336,27 @@ async function setupLoginPage(api) {
       return;
     }
 
+    authFlowInProgress = true;
     try {
       await api.login(email, password, Boolean(rememberMe?.checked));
-      setMessage("Access granted. Redirecting to GrapheneX Academy…", true);
+      const user = api.getCurrentUser();
+      const assignedCompanyId = await api.getAssignedCompanyId(user);
+      const destination = getCompanyPortalPath(assignedCompanyId);
+      if (!destination) {
+        setMessage(
+          assignedCompanyId
+            ? "Your organization is not configured for this portal yet. Contact your administrator."
+            : "This account does not have an assigned organization. Contact your administrator."
+        );
+        authFlowInProgress = false;
+        return;
+      }
+      setMessage("Access granted. Redirecting to your learning portal…", true);
       window.setTimeout(() => {
-        window.location.replace("portal-access.html");
+        window.location.replace(destination);
       }, 450);
     } catch (error) {
+      authFlowInProgress = false;
       setMessage(toFriendlyAuthError(error?.code));
     }
   });
@@ -337,6 +395,7 @@ function setupSignupPage(api) {
       return;
     }
 
+    authFlowInProgress = true;
     try {
       const userCredential = await api.register(email, password, true);
       await api.upsertUserProfile(userCredential.user.uid, {
@@ -344,15 +403,25 @@ function setupSignupPage(api) {
         name: fullName,
         userName: fullName,
         role: "Learner",
+        admin: false,
+        ...(window.companyPortal ? { companyId: window.companyPortal.id } : {}),
         createdAt: new Date().toISOString(),
         lastLogin: new Date().toISOString()
       });
 
       setSignupMessage("Account created successfully. Redirecting to portal…", true);
+      const destination = getCompanyPortalPath(window.companyPortal?.id);
+      if (!destination) {
+        setSignupMessage("This organization is not configured yet. Contact your administrator.");
+        authFlowInProgress = false;
+        return;
+      }
       window.setTimeout(() => {
-        window.location.replace("portal-access.html");
+        window.location.replace(destination);
       }, 500);
     } catch (error) {
+      authFlowInProgress = false;
+      console.error("Unable to create account or save its profile:", error);
       setSignupMessage(toFriendlyAuthError(error?.code));
     }
   });
@@ -466,7 +535,7 @@ function setupPortalSignOut(api) {
 
     try {
       await api.logout();
-      window.location.replace("index.html");
+      window.location.replace(getCompanyLandingPath());
     } catch (error) {
       signOutBtn.disabled = false;
       signOutBtn.textContent = originalLabel;
