@@ -60,7 +60,7 @@ function getCompanyLandingPath() {
   return window.companyPortal ? `/${window.companyPortal.slug}` : "index.html";
 }
 
-function getCompanyPortalPath(companyId) {
+function getAssignedCompanyPortalPath(companyId) {
   if (companyId) {
     return window.getCompanyPortalPath?.(companyId) || null;
   }
@@ -282,7 +282,7 @@ async function protectDashboardRoute(api) {
 
     const assignedCompanyId = await api.getAssignedCompanyId(user);
     if (window.companyPortal && assignedCompanyId !== window.companyPortal.id) {
-      const assignedPath = getCompanyPortalPath(assignedCompanyId);
+      const assignedPath = getAssignedCompanyPortalPath(assignedCompanyId);
       if (assignedPath) {
         window.location.replace(assignedPath);
       } else {
@@ -305,7 +305,7 @@ async function setupLoginPage(api) {
       void (async () => {
         try {
           const assignedCompanyId = await api.getAssignedCompanyId(user);
-          const destination = getCompanyPortalPath(assignedCompanyId);
+          const destination = getAssignedCompanyPortalPath(assignedCompanyId);
           if (destination) {
             window.location.replace(destination);
           } else if (window.companyPortal) {
@@ -342,7 +342,7 @@ async function setupLoginPage(api) {
       await api.login(email, password, Boolean(rememberMe?.checked));
       const user = api.getCurrentUser();
       const assignedCompanyId = await api.getAssignedCompanyId(user);
-      const destination = getCompanyPortalPath(assignedCompanyId);
+      const destination = getAssignedCompanyPortalPath(assignedCompanyId);
       if (!destination) {
         setMessage(
           assignedCompanyId
@@ -412,7 +412,7 @@ function setupSignupPage(api) {
       });
 
       setSignupMessage("Account created successfully. Redirecting to portal…", true);
-      const destination = getCompanyPortalPath(window.companyPortal?.id);
+      const destination = getAssignedCompanyPortalPath(window.companyPortal?.id);
       if (!destination) {
         setSignupMessage("This organization is not configured yet. Contact your administrator.");
         authFlowInProgress = false;
