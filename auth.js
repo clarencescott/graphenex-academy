@@ -72,6 +72,7 @@ function toFriendlyAuthError(errorCode) {
     case "auth/user-not-found":
     case "auth/wrong-password":
     case "auth/invalid-credential":
+    case "auth/invalid-login-credentials":
       return "Invalid email or password.";
     case "auth/invalid-email":
       return "Please enter a valid work email address.";
@@ -357,6 +358,7 @@ async function setupLoginPage(api) {
       }, 450);
     } catch (error) {
       authFlowInProgress = false;
+      console.error("Unable to sign in or load the assigned organization:", error);
       setMessage(toFriendlyAuthError(error?.code));
     }
   });
