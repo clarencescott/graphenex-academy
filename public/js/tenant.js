@@ -3,7 +3,7 @@ const companies = {
     id: "FPL",
     slug: "fpl",
     name: "Flint Public Library",
-    logo: "/fpl-logo.svg",
+    logo: "/assets/images/fpl-logo.svg",
     colors: {
       primary: "196 100% 41%",
       primaryForeground: "0 0% 100%",
