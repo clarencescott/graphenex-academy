@@ -220,6 +220,7 @@ button { cursor: pointer; }
   background: hsl(var(--primary) / 0.12);
   border: 1px solid hsl(var(--primary) / 0.22);
   position: relative;
+  overflow: hidden;
 }
 .brandmark-shell::before {
   content: "";
@@ -228,6 +229,14 @@ button { cursor: pointer; }
   border-radius: 999px;
   border: 1px solid hsl(var(--primary) / 0.18);
   animation: pulse-ring 2.5s ease-out infinite;
+}
+.brandmark-shell img {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 0.28rem;
 }
 .brand-hex {
   width: 1.3rem;
