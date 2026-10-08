@@ -1,4 +1,20 @@
 const companies = {
+  angle: {
+    id: "ANGLE",
+    slug: "angle",
+    name: "Angle The Agency",
+    logo: "/assets/images/angle-logo.jpeg",
+    colors: {
+      primary: "196 100% 41%",
+      primaryForeground: "0 0% 100%",
+      accent: "67 68% 51%",
+      background: "195 100% 97%",
+      foreground: "218 25% 14%",
+      card: "0 0% 100%",
+      secondary: "195 72% 90%",
+      border: "195 35% 82%"
+    }
+  },
   fpl: {
     id: "FPL",
     slug: "fpl",
