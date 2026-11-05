@@ -10,7 +10,7 @@
     "seed-existing-orgs": "node scripts/seed-existing-orgs.mjs"
   },
   "dependencies": {
-    "firebase-admin": "^14.5.0",
+    "firebase-admin": "^13.10.0",
     "stripe": "^23.1.0"
   },
   "devDependencies": {
