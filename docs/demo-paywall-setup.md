@@ -14,7 +14,7 @@ Do these in order. Step 3 must happen before step 5 or current staff lose their 
 3. **Keep Angle and FPL on full access:** run `FIREBASE_SERVICE_ACCOUNT="$(cat service-account.json)" npm run seed-existing-orgs`. It prints each organization's starting code for new staff. Codes expire after 60 days, and each admin sees the replacement on their dashboard.
 4. **Stripe webhook:** point it at `https://<site>/api/stripe/webhook` with `checkout.session.completed`, `checkout.session.async_payment_succeeded`, `charge.refunded`, `invoice.paid` and `customer.subscription.deleted`.
 5. **Deploy, then publish the rules:** run `npm test`, deploy to Vercel, then run `firebase deploy --only firestore:rules`.
-   Checkout collects sales tax automatically, so turn on Stripe Tax and add your tax registrations in both test and live mode first. Checkout fails without them. For production, set `SITE_URL` to `https://www.graphenexacademy.com`.
+   Checkout calculates sales tax automatically with Stripe Tax. Set your head office address in Stripe Tax settings, and add a registration for each state where you must collect, in both test and live mode. Without a registration Stripe charges no tax for that state. Stripe reports these plans as exempt from Michigan sales tax, so confirm the product tax code with your accountant. For production, set `SITE_URL` to `https://www.graphenexacademy.com`.
 6. **Test:** with Stripe test keys, sign up, buy with card 4242 4242 4242 4242, confirm access, then cancel or refund and confirm it locks. A subscription locks when it is cancelled, not when a single invoice is refunded.
 
 To change the demo length for existing accounts, edit `access/{uid}.trialEndsAt`. New demos use `DEMO_DAYS`.
