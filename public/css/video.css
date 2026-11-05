@@ -1,0 +1,25 @@
+/* On-page course video player and quiz lock. */
+.course-video-link { display: block; width: 100%; padding: 0; border: 0; background: none; cursor: pointer; text-align: inherit; font: inherit; color: inherit; }
+.course-quiz-toggle:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.course-video-dialog {
+  width: min(960px, calc(100vw - 32px));
+  max-height: calc(100vh - 32px);
+  padding: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  background: #0b1220;
+  color: #f1f5f9;
+}
+.course-video-dialog::backdrop { background: rgba(0, 0, 0, 0.7); }
+.course-video-dialog-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+.course-video-dialog-header h2 { margin: 0; font-size: 1.15rem; }
+.course-video-close { border: 0; background: transparent; color: inherit; font-size: 1.75rem; line-height: 1; cursor: pointer; padding: 4px 10px; }
+.course-video-frame { position: relative; width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: 8px; overflow: hidden; }
+.course-video-frame iframe, .course-video-frame > div { position: absolute; inset: 0; width: 100%; height: 100%; }
+.course-video-progress { margin-top: 12px; }
+.course-video-bar { position: relative; height: 10px; border-radius: 999px; background: rgba(255, 255, 255, 0.15); overflow: hidden; }
+.course-video-bar span { display: block; height: 100%; width: 0; background: #22c55e; transition: width 0.3s; }
+.course-video-mark { position: absolute; left: 90%; top: 0; bottom: 0; width: 2px; background: #f8fafc; }
+.course-video-status { margin: 8px 0 0; font-size: 0.9rem; }
+.course-video-error { margin: 8px 0 0; color: #fca5a5; }
