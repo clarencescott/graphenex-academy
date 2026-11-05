@@ -406,18 +406,14 @@ function setupSignupPage(api) {
         userName: fullName,
         role: "Learner",
         admin: false,
-        ...(window.companyPortal ? { companyId: window.companyPortal.id } : {}),
+        // Organization membership is granted only by the server, with a valid join code.
         createdAt: new Date().toISOString(),
         lastLogin: new Date().toISOString()
       });
 
       setSignupMessage("Account created successfully. Redirecting to portal…", true);
-      const destination = getAssignedCompanyPortalPath(window.companyPortal?.id);
-      if (!destination) {
-        setSignupMessage("This organization is not configured yet. Contact your administrator.");
-        authFlowInProgress = false;
-        return;
-      }
+      // New accounts start in the demo; the join-code prompt there moves them into an organization.
+      const destination = "/portal-access.html";
       window.setTimeout(() => {
         window.location.replace(destination);
       }, 500);
