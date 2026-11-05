@@ -16,7 +16,7 @@ export function getBest(id) {
   }
 }
 
-function saveBest(id, score) {
+export function saveBest(id, score) {
   const previous = getBest(id);
   if (score > previous) {
     try {
@@ -28,7 +28,7 @@ function saveBest(id, score) {
   return Math.max(previous, score);
 }
 
-function shuffle(list) {
+export function shuffle(list) {
   const copy = [...list];
   for (let index = copy.length - 1; index > 0; index -= 1) {
     const swap = Math.floor(Math.random() * (index + 1));
@@ -37,7 +37,7 @@ function shuffle(list) {
   return copy;
 }
 
-function shell(root, ctx, badge) {
+export function shell(root, ctx, badge) {
   root.innerHTML = `
     <div class="game-shell-header">
       <button class="back-link" type="button" data-back>← All mini games</button>
@@ -52,7 +52,7 @@ function shell(root, ctx, badge) {
   };
 }
 
-function results(root, ctx, { id, score, title, message, detail }) {
+export function results(root, ctx, { id, score, title, message, detail }) {
   const best = saveBest(id, score);
   root.innerHTML = `
     <div class="game-shell-header">

@@ -154,6 +154,32 @@ async function recordResourceRead(resourceId) {
   }
 }
 
+async function recordMissionComplete(resourceId) {
+  const user = auth.currentUser;
+  const normalizedId = String(resourceId || "").trim();
+  if (!user?.uid) {
+    throw new Error("You must be signed in to save your mission progress.");
+  }
+  if (!normalizedId) {
+    throw new Error("Missing mission ID.");
+  }
+
+  const payload = {
+    missionsCompleted: arrayUnion(normalizedId),
+    updatedAt: new Date().toISOString()
+  };
+  const writes = await Promise.allSettled(
+    ["users", "profiles"].map((collectionName) =>
+      setDoc(doc(db, collectionName, user.uid), payload, { merge: true })
+    )
+  );
+
+  if (!writes.some((result) => result.status === "fulfilled")) {
+    const firstError = writes.find((result) => result.status === "rejected");
+    throw firstError?.reason || new Error("Failed to save mission progress.");
+  }
+}
+
 async function reauthenticateCurrentUser(currentPassword) {
   const user = auth.currentUser;
   if (!user?.email) {
@@ -312,5 +338,6 @@ window.grapheneAuth = {
   getAllUserProgress,
   recordCourseCompletion,
   recordResourceRead,
+  recordMissionComplete,
   getCurrentUser: () => auth.currentUser
 };
