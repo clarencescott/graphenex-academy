@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="/css/styles.css" />
     <link rel="stylesheet" href="/css/access.css" />
     <link rel="stylesheet" href="/css/video.css" />
+    <link rel="stylesheet" href="/css/games.css" />
     <script src="/js/tenant.js"></script>
     <style>
       .settings-drawer.hidden-panel {
@@ -699,7 +700,7 @@
 
     <script>
       const games = [
-        { id: 'phish', title: 'Phish or Legit', icon: 'Fish', duration: '~3 min', tag: 'CYBERSECURITY', blurb: 'Spot the phishing lures hiding in your inbox.' },
+        { id: 'phish', title: 'Phish or Legit', icon: 'Fish', duration: '~3 min', tag: 'CYBERSECURITY', demo: true, blurb: 'Spot the phishing lures hiding in your inbox.' },
         { id: 'password', title: 'Password Forge', icon: 'KeyRound', duration: '~2 min', tag: 'CYBERSECURITY', blurb: 'Build a fortress-grade password from security blocks.' },
         { id: 'reflex', title: 'Reflex Pulse', icon: 'Zap', duration: '~2 min', tag: 'CYBERSECURITY', blurb: 'Rapid-fire true/false security instincts check.' }
       ];
@@ -760,7 +761,14 @@
       const miniGamesRoot = document.getElementById('miniGamesRoot');
       let selectedGame = null;
 
+      const allGames = () => [...games, ...(window.graphenexExtraGames || [])];
+      const isDemoUser = () => window.grapheneAccessState === 'demo';
+      const isLocked = (game) => isDemoUser() && !game.demo;
+      let leaveHandlers = [];
+
       function renderHub() {
+        leaveHandlers.forEach((handler) => handler());
+        leaveHandlers = [];
         const hub = `
           <div class="mini-games-header">
             <div>
@@ -769,8 +777,8 @@
             </div>
           </div>
           <div class="game-grid">
-            ${games.map(game => `
-              <article class="game-card refraction-hover" data-game-id="${game.id}">
+            ${allGames().map(game => `
+              <article class="game-card refraction-hover ${isLocked(game) ? 'game-locked' : ''}" data-game-id="${game.id}">
                 <div class="game-head">
                   <div class="game-icon-box">${renderGameIcon(game.icon)}</div>
                   <span class="mono-label game-duration">${game.duration}</span>
@@ -778,7 +786,9 @@
                 <div class="mono-label game-tag">${game.tag}</div>
                 <h3>${game.title}</h3>
                 <p>${game.blurb}</p>
-                <button class="play-link" type="button" data-game-id="${game.id}">Play now ?</button>
+                ${isLocked(game)
+                  ? `<button class="play-link" type="button" data-game-id="${game.id}">Unlock with full access</button>`
+                  : `<button class="play-link" type="button" data-game-id="${game.id}">Play now ?${window.graphenexGameBest && window.graphenexGameBest(game.id) ? ` · Best ${window.graphenexGameBest(game.id)}` : ''}</button>`}
               </article>
             `).join('')}
           </div>
@@ -787,7 +797,13 @@
         miniGamesRoot.innerHTML = hub;
         document.querySelectorAll('[data-game-id]').forEach((button) => {
           button.addEventListener('click', (event) => {
+            event.stopPropagation();
             const targetId = event.currentTarget.getAttribute('data-game-id');
+            const target = allGames().find((game) => game.id === targetId);
+            if (target && isLocked(target)) {
+              window.grapheneUpgrade?.();
+              return;
+            }
             selectedGame = targetId;
             renderGame();
           });
@@ -809,6 +825,12 @@
           return;
         }
 
+        const extra = (window.graphenexExtraGames || []).find((game) => game.id === selectedGame);
+        if (extra) {
+          renderExtraGame(extra);
+          return;
+        }
+
         if (selectedGame === 'phish') {
           renderPhishGame();
           return;
@@ -820,6 +842,26 @@
         }
 
         renderReflexGame();
+      }
+
+      function renderExtraGame(game) {
+        if (isLocked(game)) {
+          selectedGame = null;
+          renderHub();
+          return;
+        }
+        leaveHandlers.forEach((handler) => handler());
+        leaveHandlers = [];
+        const root = document.createElement('div');
+        root.className = 'game-shell';
+        const ctx = {
+          back() { selectedGame = null; renderGame(); },
+          replay() { renderExtraGame(game); },
+          onLeave(handler) { leaveHandlers.push(handler); }
+        };
+        miniGamesRoot.innerHTML = '';
+        miniGamesRoot.appendChild(root);
+        game.play(root, ctx);
       }
 
       function renderPhishGame() {
@@ -1087,8 +1129,12 @@
       }
 
       renderHub();
+      const refreshHub = () => { if (!selectedGame) renderHub(); };
+      document.addEventListener('games-ready', refreshHub);
+      document.addEventListener('access-ready', refreshHub);
     </script>
     <script type="module" src="/js/courses.js"></script>
+    <script type="module" src="/js/minigames-extra.js"></script>
     <script type="module" src="/js/firebase.js"></script>
     <script>
       (() => {

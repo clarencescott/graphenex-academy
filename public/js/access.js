@@ -151,7 +151,7 @@ function joinForm() {
   return form;
 }
 
-async function showUpgradeDialog() {
+export async function showUpgradeDialog() {
   let dialog = document.getElementById("accessUpgradeDialog");
   if (!dialog) {
     dialog = element("dialog", "access-dialog");
@@ -241,6 +241,10 @@ export async function ensureAccess() {
     console.error("Unable to check access:", error);
     return null;
   }
+
+  window.grapheneAccessState = currentAccess.state;
+  window.grapheneUpgrade = showUpgradeDialog;
+  document.dispatchEvent(new CustomEvent("access-ready", { detail: currentAccess }));
 
   if (currentAccess.state === "demo") showDemoBanner(currentAccess);
   if (currentAccess.state === "paid" && currentAccess.canManageBilling) {
