@@ -19,7 +19,7 @@ const companies = {
     id: "BIOGLYTCH",
     slug: "bioglytch",
     name: "BioGlytch Studios",
-    logo: "/assets/images/graphene-logo.png",
+    logo: "/assets/images/bioglytch-logo.png",
     colors: {
       primary: "196 100% 41%",
       primaryForeground: "0 0% 100%",

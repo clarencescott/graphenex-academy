@@ -1,0 +1,28 @@
+/* Portal tabs and the Resources reading list. */
+.portal-tabs { display: flex; gap: 8px; padding-top: 20px; padding-bottom: 8px; flex-wrap: wrap; }
+.portal-tab { padding: 8px 18px; border-radius: 999px; border: 1px solid hsl(var(--border)); background: hsl(var(--card)); color: hsl(var(--foreground)); font: inherit; cursor: pointer; }
+.portal-tab.active { background: hsl(var(--primary)); border-color: hsl(var(--primary)); color: hsl(var(--primary-foreground)); }
+.portal-tab:focus-visible { outline: 2px solid hsl(var(--primary)); outline-offset: 2px; }
+
+.resources-section { padding: 16px 0 48px; }
+.resources-header { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; }
+.resources-header h2 { margin: 4px 0 0; }
+.resources-progress { min-width: 220px; display: grid; gap: 6px; }
+.resources-track { height: 8px; border-radius: 999px; background: hsl(var(--foreground) / 0.12); overflow: hidden; }
+.resources-track span { display: block; height: 100%; background: hsl(var(--primary)); transition: width 0.3s; }
+
+.resources-list { display: grid; gap: 12px; }
+.resource-card { border: 1px solid hsl(var(--border)); border-radius: 12px; background: hsl(var(--card)); overflow: hidden; }
+.resource-card.is-read { border-color: hsl(var(--primary) / 0.5); }
+.resource-card.is-locked { opacity: 0.65; }
+.resource-toggle { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; padding: 16px; border: 0; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.resource-toggle:focus-visible { outline: 2px solid hsl(var(--primary)); outline-offset: -2px; }
+.resource-title-block { display: grid; gap: 4px; }
+.resource-summary { font-size: 0.9rem; opacity: 0.8; }
+.resource-status { flex: none; font-size: 0.85rem; padding: 4px 10px; border-radius: 999px; background: hsl(var(--secondary)); }
+.resource-card.is-read .resource-status { background: hsl(var(--primary) / 0.15); }
+.resource-body { padding: 0 16px 16px; display: grid; gap: 12px; line-height: 1.6; }
+.resource-body p { margin: 0; }
+.resource-takeaways { padding: 12px 14px; border-radius: 10px; background: hsl(var(--secondary) / 0.6); }
+.resource-takeaways ul { margin: 8px 0 0; padding-left: 1.2rem; display: grid; gap: 4px; }
+.resource-body button { justify-self: start; }

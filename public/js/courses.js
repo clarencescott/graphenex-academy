@@ -262,6 +262,11 @@ function updateCourseCompletionBadges() {
   });
 }
 
+function resourcesRead(user) {
+  const ids = Array.isArray(user.readResourceIds) ? user.readResourceIds : [];
+  return new Set(ids.map((id) => String(id || "").trim()).filter(Boolean)).size;
+}
+
 function renderMasterUsers(users) {
   const courses = Array.isArray(window.firebaseCourses) ? window.firebaseCourses : [];
   const courseTitles = new Map(courses.map((course) => [course.id, course.title || "Untitled Course"]));
@@ -289,6 +294,7 @@ function renderMasterUsers(users) {
           <td>${escapeHtml(displayName)}</td>
           <td>${escapeHtml(email)}</td>
           <td>${completedIds.length} / ${courses.length}</td>
+          <td>${resourcesRead(user)} / ${window.graphenexResources?.length ?? 0}</td>
           <!--- <td>${completedCourses}</td> --->
         </tr>
       `;
