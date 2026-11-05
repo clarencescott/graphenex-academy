@@ -1,6 +1,7 @@
 // Load courses from Firebase
 import { collection, getDocs } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
 import { db } from "./firebase.js";
+import { ensureAccess, showAdminOrganization } from "./access.js";
 
 const container = document.getElementById("coursesContainer");
 const quizModal = document.getElementById("courseQuizModal");
@@ -279,6 +280,10 @@ function renderMasterUsers(users) {
   masterCompletionCount.textContent = String(completionCount);
 }
 
+async function getDashboardCompanyId() {
+  return window.companyPortal?.id || window.grapheneAuth.getAssignedCompanyId();
+}
+
 async function refreshMasterDashboard() {
   if (!masterDashboard || !masterUsersBody || !masterDashboardMessage || !masterRefreshButton) {
     return;
@@ -290,7 +295,7 @@ async function refreshMasterDashboard() {
 
   try {
     await window.firebaseCoursesReady;
-    const users = await window.grapheneAuth.getAllUserProgress(window.companyPortal?.id);
+    const users = await window.grapheneAuth.getAllUserProgress(await getDashboardCompanyId());
     renderMasterUsers(users);
     masterDashboardMessage.textContent = `Showing progress for ${users.length} learner accounts.`;
   } catch (error) {
@@ -350,11 +355,17 @@ window.grapheneAuth.observeAuthState(async (user) => {
     return;
   }
 
+  const access = await ensureAccess();
+  if (access?.state !== "expired") {
+    await loadCourses();
+  }
+
   if (masterDashboard) {
     try {
-      masterDashboard.hidden = !(await window.grapheneAuth.isCompanyAdmin(window.companyPortal?.id, user));
+      masterDashboard.hidden = !(await window.grapheneAuth.isCompanyAdmin(await getDashboardCompanyId(), user));
       if (!masterDashboard.hidden) {
         await refreshMasterDashboard();
+        showAdminOrganization();
       }
     } catch (error) {
       masterDashboard.hidden = true;
@@ -381,4 +392,3 @@ quizModal?.addEventListener("click", (event) => {
     quizModal.close();
   }
 });
-loadCourses();

@@ -1,0 +1,43 @@
+.topbar-actions { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+[data-company-portal] .demo-cta { display: none; }
+@media (max-width: 560px) {
+  .topbar-actions button { padding-inline: 12px; font-size: 0.72rem; white-space: nowrap; }
+}
+
+.access-banner {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 12px 20px;
+  padding: 10px 16px; font-weight: 600;
+  background: hsl(var(--secondary)); border-bottom: 1px solid hsl(var(--border));
+}
+
+body.access-locked main { display: none; }
+.access-paywall { padding-block: 64px; text-align: center; }
+.access-paywall h1, .access-dialog h2 { margin: 0 0 8px; }
+.access-copy { color: hsl(var(--muted)); max-width: 56ch; margin: 0 auto 24px; }
+.access-plans {
+  display: grid; gap: 16px; margin: 24px 0; text-align: left;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+}
+.access-plan {
+  display: flex; flex-direction: column; gap: 10px; padding: 20px;
+  background: hsl(var(--card)); border: 1px solid hsl(var(--border)); border-radius: var(--radius);
+}
+.access-plan h3, .access-plan p { margin: 0; }
+.access-plan p { color: hsl(var(--muted)); font-size: 0.9rem; }
+.access-plan button { margin-top: auto; }
+.access-plan-price { font-size: 1.9rem; line-height: 1.2; }
+.access-input {
+  width: 100%; min-width: 0; padding: 10px 12px; font: inherit; color: hsl(var(--foreground));
+  background: hsl(var(--background)); border: 1px solid hsl(var(--border)); border-radius: 10px;
+}
+.access-join { max-width: 360px; margin: 24px auto 0; text-align: left; }
+.access-join label { display: block; margin-bottom: 6px; font-weight: 600; }
+.access-join-row { display: flex; gap: 8px; }
+.access-message { min-height: 1.5em; margin: 8px 0 0; color: #f87171; }
+.access-dialog {
+  width: min(860px, calc(100vw - 32px)); max-height: calc(100vh - 32px); padding: 24px;
+  color: hsl(var(--foreground)); background: hsl(var(--background));
+  border: 1px solid hsl(var(--border)); border-radius: var(--radius);
+}
+.access-dialog::backdrop { background: rgba(0, 0, 0, 0.6); }
+.access-close { float: right; }

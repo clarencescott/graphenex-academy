@@ -1,0 +1,21 @@
+{
+  "name": "graphenex-academy",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": "24.x"
+  },
+  "scripts": {
+    "test": "firebase emulators:exec --only firestore --project demo-graphenex \"node --test test/\"",
+    "seed-existing-orgs": "node scripts/seed-existing-orgs.mjs"
+  },
+  "dependencies": {
+    "firebase-admin": "^13.10.0",
+    "stripe": "^23.1.0"
+  },
+  "devDependencies": {
+    "@firebase/rules-unit-testing": "^5.0.2",
+    "firebase": "^12.0.0",
+    "firebase-tools": "^15.35.0"
+  }
+}

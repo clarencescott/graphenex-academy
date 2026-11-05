@@ -24,6 +24,26 @@ service cloud.firestore {
         && get(userRecordPath(request.auth.uid)).data.get('companyId', '') == companyId;
     }
 
+    function accessPath() {
+      return /databases/$(database)/documents/access/$(request.auth.uid);
+    }
+
+    function orgPath(orgId) {
+      return /databases/$(database)/documents/organizations/$(orgId);
+    }
+
+    function isUnexpired(data, field) {
+      return data.get(field, timestamp.value(0)) > request.time;
+    }
+
+    function hasTrainingAccess() {
+      let access = get(accessPath()).data;
+      let orgId = access.get('orgId', '');
+      return isUnexpired(access, 'trialEndsAt')
+        || isUnexpired(access, 'paidUntil')
+        || (orgId != '' && exists(orgPath(orgId)) && isUnexpired(get(orgPath(orgId)).data, 'paidUntil'));
+    }
+
     function uidMatchesPath(uid) {
       return signedIn() && request.auth.uid == uid;
     }
@@ -110,8 +130,15 @@ service cloud.firestore {
     }
 
     match /courses/{courseId} {
-      allow read: if signedIn();
-      allow create, update, delete: if isAdmin();
+      allow read: if signedIn() && exists(accessPath()) && hasTrainingAccess();
+      // Courses are shared by every organization, so they are edited from the Firebase console.
+      allow create, update, delete: if false;
+    }
+
+    // Demo and license records are written only by the server.
+    match /access/{uid} {
+      allow get: if uidMatchesPath(uid);
+      allow list, write: if false;
     }
 
     match /{document=**} {

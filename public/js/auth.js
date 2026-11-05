@@ -62,7 +62,7 @@ function getCompanyLandingPath() {
 
 function getAssignedCompanyPortalPath(companyId) {
   if (companyId) {
-    return window.getCompanyPortalPath?.(companyId) || null;
+    return window.getCompanyPortalPath?.(companyId) || "/portal-access.html";
   }
   return window.companyPortal ? null : "portal-access.html";
 }
