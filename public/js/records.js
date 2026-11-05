@@ -114,11 +114,13 @@ function createWriter(PDF, headerText) {
 function writeLearner(writer, { name, email, orgName, profile, courses, resourcesTotal, videoPercents }) {
   const completed = resolveCompleted(profile, courses);
   const readCount = Array.isArray(profile.readResourceIds) ? profile.readResourceIds.length : 0;
+  const missionCount = Array.isArray(profile.missionsCompleted) ? profile.missionsCompleted.length : 0;
+  const missionTotal = window.graphenexMissionTotal || 0;
 
   writer.write(name || "Learner", { size: 15, bold: true, gap: 2 });
   writer.write([email, orgName].filter(Boolean).join("  |  "), { size: 9.5, color: 110, gap: 6 });
   writer.write(
-    `${completed.length} of ${courses.length} courses completed  |  ${readCount} of ${resourcesTotal} reading guides marked as read`,
+    `${completed.length} of ${courses.length} courses completed  |  ${readCount} of ${resourcesTotal} reading guides marked as read${missionTotal ? `  |  ${missionCount} of ${missionTotal} game missions completed` : ""}`,
     { size: 10, bold: true, gap: 8 }
   );
 
