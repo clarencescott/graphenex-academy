@@ -120,6 +120,32 @@ async function recordCourseCompletion(courseId) {
   }
 }
 
+async function recordResourceRead(resourceId) {
+  const user = auth.currentUser;
+  const normalizedId = String(resourceId || "").trim();
+  if (!user?.uid) {
+    throw new Error("You must be signed in to save your reading progress.");
+  }
+  if (!normalizedId) {
+    throw new Error("Missing resource ID.");
+  }
+
+  const payload = {
+    readResourceIds: arrayUnion(normalizedId),
+    updatedAt: new Date().toISOString()
+  };
+  const writes = await Promise.allSettled(
+    ["users", "profiles"].map((collectionName) =>
+      setDoc(doc(db, collectionName, user.uid), payload, { merge: true })
+    )
+  );
+
+  if (!writes.some((result) => result.status === "fulfilled")) {
+    const firstError = writes.find((result) => result.status === "rejected");
+    throw firstError?.reason || new Error("Failed to save reading progress.");
+  }
+}
+
 async function reauthenticateCurrentUser(currentPassword) {
   const user = auth.currentUser;
   if (!user?.email) {
@@ -277,5 +303,6 @@ window.grapheneAuth = {
   isCompanyAdmin,
   getAllUserProgress,
   recordCourseCompletion,
+  recordResourceRead,
   getCurrentUser: () => auth.currentUser
 };

@@ -15,6 +15,7 @@
     <link rel="stylesheet" href="/css/access.css" />
     <link rel="stylesheet" href="/css/video.css" />
     <link rel="stylesheet" href="/css/games.css" />
+    <link rel="stylesheet" href="/css/resources.css" />
     <script src="/js/tenant.js"></script>
     <style>
       .settings-drawer.hidden-panel {
@@ -645,6 +646,7 @@
                       <th scope="col">Learner</th>
                       <th scope="col">Email</th>
                       <th scope="col">Completed</th>
+                      <th scope="col">Resources read</th>
                      <!--- <th scope="col">Completed Courses</th> -->
                     </tr>
                   </thead>
@@ -652,6 +654,18 @@
                 </table>
               </div>
             </div>
+          </div>
+        </section>
+
+        <nav class="portal-tabs container-shell" aria-label="Portal sections" role="tablist">
+          <button class="portal-tab active" type="button" role="tab" data-portal-tab="courses" aria-selected="true">Courses</button>
+          <button class="portal-tab" type="button" role="tab" data-portal-tab="drills" aria-selected="false">Drills</button>
+          <button class="portal-tab" type="button" role="tab" data-portal-tab="resources" aria-selected="false">Resources</button>
+        </nav>
+
+        <section id="resourcesSection" class="resources-section" hidden>
+          <div class="container-shell">
+            <div id="resourcesRoot"></div>
           </div>
         </section>
 
@@ -1135,6 +1149,7 @@
     </script>
     <script type="module" src="/js/courses.js"></script>
     <script type="module" src="/js/minigames-extra.js"></script>
+    <script type="module" src="/js/resources.js"></script>
     <script type="module" src="/js/firebase.js"></script>
     <script>
       (() => {
