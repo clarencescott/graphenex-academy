@@ -1,7 +1,7 @@
 // Load courses from Firebase
 import { collection, getDocs } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
 import { db } from "./firebase.js";
-import { ensureAccess, showAdminOrganization } from "./access.js";
+import { ensureAccess, showAdminOrganization, showUpgradeDialog } from "./access.js";
 import { UNLOCK_PERCENT, getVideoPercent, loadVideoProgress, openCourseVideo } from "./video.js";
 
 const container = document.getElementById("coursesContainer");
@@ -329,7 +329,27 @@ async function refreshMasterDashboard() {
 
 masterRefreshButton?.addEventListener("click", refreshMasterDashboard);
 
-async function loadCourses() {
+async function fetchDemoCourses() {
+  const token = await window.grapheneAuth.getCurrentUser().getIdToken();
+  const response = await fetch("/api/courses", { headers: { Authorization: `Bearer ${token}` } });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(data.error || "Unable to load courses.");
+  return data;
+}
+
+function demoNotice(shown, total) {
+  const notice = document.createElement("article");
+  notice.className = "card demo-courses-note";
+  notice.innerHTML = `
+    <h4>${escapeHtml(`Demo: ${shown} of ${total} courses`)}</h4>
+    <p>The full catalog, every quiz and every drill unlock with a plan.</p>
+    <button class="primary-btn" type="button">Get full access</button>
+  `;
+  notice.querySelector("button").addEventListener("click", showUpgradeDialog);
+  return notice;
+}
+
+async function loadCourses(access) {
   if (!container) {
     return;
   }
@@ -338,18 +358,27 @@ async function loadCourses() {
 
   const coursesPromise = (async () => {
     try {
-      const querySnapshot = await getDocs(collection(db, "courses"));
+      let loadedCourses;
+      let demoTotal = 0;
+      if (access?.state === "demo") {
+        const demo = await fetchDemoCourses();
+        loadedCourses = demo.courses;
+        demoTotal = demo.limited ? demo.total : 0;
+      } else {
+        const querySnapshot = await getDocs(collection(db, "courses"));
+        loadedCourses = querySnapshot.docs.map((docSnapshot) => ({
+          id: docSnapshot.id,
+          ...docSnapshot.data()
+        }));
+      }
 
-      if (querySnapshot.empty) {
+      if (!loadedCourses.length) {
         container.innerHTML = '<div class="empty-state">No courses found in Firebase yet.</div>';
         return [];
       }
 
-      const loadedCourses = querySnapshot.docs.map((docSnapshot) => ({
-        id: docSnapshot.id,
-        ...docSnapshot.data()
-      }));
       container.replaceChildren(...loadedCourses.map(renderCourse));
+      if (demoTotal) container.append(demoNotice(loadedCourses.length, demoTotal));
       return loadedCourses;
     } catch (error) {
       console.error("Error loading courses:", error);
@@ -378,7 +407,7 @@ window.grapheneAuth.observeAuthState(async (user) => {
 
   const access = await ensureAccess();
   if (access?.state !== "expired") {
-    const courses = await loadCourses();
+    const courses = await loadCourses(access);
     await loadVideoProgress(courses || []);
     updateCourseCompletionBadges();
   }

@@ -1,0 +1,48 @@
+/* Extra mini games and demo locks. */
+.game-locked { opacity: 0.65; }
+.game-locked .play-link { text-decoration: underline; }
+
+.patrol-hud { display: flex; align-items: center; gap: 12px; margin: 10px 0; }
+.patrol-hud [data-time] { font-variant-numeric: tabular-nums; min-width: 3ch; }
+.patrol-health { flex: 1; height: 10px; border-radius: 999px; background: hsl(var(--foreground) / 0.12); overflow: hidden; }
+.patrol-health span { display: block; height: 100%; background: hsl(var(--primary)); transition: width 0.25s; }
+.patrol-lane { position: relative; height: 320px; border-radius: 12px; overflow: hidden; border: 1px solid hsl(var(--border)); background: linear-gradient(90deg, hsl(var(--secondary) / 0.6), hsl(var(--card))); }
+.patrol-packet { position: absolute; max-width: 190px; padding: 6px 10px; border-radius: 8px; border: 1px solid hsl(var(--primary) / 0.4); background: hsl(var(--card)); color: hsl(var(--foreground)); font-size: 0.78rem; line-height: 1.2; text-align: left; cursor: crosshair; will-change: left, top; }
+.patrol-packet:hover, .patrol-packet:focus-visible { outline: 2px solid hsl(var(--primary)); }
+.patrol-hint { min-height: 1.4em; margin: 10px 0 0; font-size: 0.9rem; }
+
+.match-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 12px; }
+.match-card { position: relative; min-height: 96px; border-radius: 10px; border: 1px solid hsl(var(--border)); background: hsl(var(--secondary)); color: hsl(var(--foreground)); font: inherit; cursor: pointer; padding: 8px; }
+.match-card .match-front { display: none; font-size: 0.85rem; }
+.match-card .match-back { font-size: 1.6rem; opacity: 0.5; }
+.match-card.flipped, .match-card.matched { background: hsl(var(--card)); }
+.match-card.flipped .match-front, .match-card.matched .match-front { display: block; }
+.match-card.flipped .match-back, .match-card.matched .match-back { display: none; }
+.match-card.matched { border-color: hsl(var(--primary)); background: hsl(var(--primary) / 0.08); }
+
+.incident-title { margin: 6px 0; }
+.incident-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 12px; align-items: start; }
+.incident-done { margin: 0; padding-left: 1.2rem; display: grid; gap: 8px; }
+.incident-done li strong { display: block; }
+.incident-done li span { display: block; font-size: 0.85rem; opacity: 0.8; }
+.incident-pool { display: grid; gap: 8px; }
+.incident-step { text-align: left; }
+.wrong-shake { animation: shake 0.35s; }
+@keyframes shake { 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+
+.chat-log { display: grid; gap: 8px; margin: 10px 0; }
+.chat-line { max-width: 85%; padding: 10px 12px; border-radius: 12px; }
+.chat-line.caller { background: hsl(var(--secondary)); justify-self: start; }
+.chat-line.you { background: hsl(var(--primary) / 0.12); justify-self: end; }
+.chat-note { font-size: 0.82rem; opacity: 0.8; justify-self: end; max-width: 85%; }
+.chat-choices { display: grid; gap: 8px; }
+.chat-choice { text-align: left; }
+
+@media (max-width: 640px) {
+  .match-grid { grid-template-columns: repeat(3, 1fr); }
+  .incident-layout { grid-template-columns: 1fr; }
+  .patrol-lane { height: 260px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .wrong-shake { animation: none; }
+}

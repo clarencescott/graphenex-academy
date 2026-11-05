@@ -18,3 +18,9 @@ Do these in order. Step 3 must happen before step 5 or current staff lose their 
 6. **Test:** with Stripe test keys, sign up, buy with card 4242 4242 4242 4242, confirm access, then cancel or refund and confirm it locks. A subscription locks when it is cancelled, not when a single invoice is refunded.
 
 To change the demo length for existing accounts, edit `access/{uid}.trialEndsAt`. New demos use `DEMO_DAYS`.
+
+## Demo limits and extra organizations
+
+- **Demo courses:** demo accounts see only the first 2 courses (sorted by title), served by `/api/courses`. The Firestore rules (`hasPaidAccess`) block demo accounts from reading the `courses` collection directly, so publish the rules after the new code is live. Change the number with `DEMO_COURSE_LIMIT` in `api/courses.js`.
+- **Demo games:** the demo includes Phish or Legit and Packet Patrol. Every other game shows a lock. Games are static browser code, so this lock is a visible limit, not a security boundary.
+- **Create an organization:** `FIREBASE_SERVICE_ACCOUNT="$(cat service-account.json)" npm run create-org -- BIOGLYTCH "BioGlytch Studios" admin@example.com`. The ID must match `public/js/tenant.js`; the email is optional and must already have an account.

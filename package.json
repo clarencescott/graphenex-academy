@@ -7,7 +7,8 @@
   },
   "scripts": {
     "test": "firebase emulators:exec --only firestore --project demo-graphenex \"node --test test/\"",
-    "seed-existing-orgs": "node scripts/seed-existing-orgs.mjs"
+    "seed-existing-orgs": "node scripts/seed-existing-orgs.mjs",
+    "create-org": "node scripts/create-org.mjs"
   },
   "dependencies": {
     "firebase-admin": "^13.10.0",

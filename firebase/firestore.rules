@@ -44,6 +44,15 @@ service cloud.firestore {
         || (orgId != '' && exists(orgPath(orgId)) && isUnexpired(get(orgPath(orgId)).data, 'paidUntil'));
     }
 
+    // Paid individuals and members of a paid organization. Demo accounts are not included:
+    // they get a limited course list from the server instead.
+    function hasPaidAccess() {
+      let access = get(accessPath()).data;
+      let orgId = access.get('orgId', '');
+      return isUnexpired(access, 'paidUntil')
+        || (orgId != '' && exists(orgPath(orgId)) && isUnexpired(get(orgPath(orgId)).data, 'paidUntil'));
+    }
+
     function uidMatchesPath(uid) {
       return signedIn() && request.auth.uid == uid;
     }
@@ -130,7 +139,7 @@ service cloud.firestore {
     }
 
     match /courses/{courseId} {
-      allow read: if signedIn() && exists(accessPath()) && hasTrainingAccess();
+      allow read: if signedIn() && exists(accessPath()) && hasPaidAccess();
       // Courses are shared by every organization, so they are edited from the Firebase console.
       allow create, update, delete: if false;
     }
