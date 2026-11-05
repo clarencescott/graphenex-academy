@@ -39,6 +39,8 @@ export default route("POST", async (req, res) => {
     line_items: [{ price: plan.priceId, quantity: 1 }],
     client_reference_id: user.uid,
     customer_email: user.email,
+    automatic_tax: { enabled: true },
+    billing_address_collection: "required",
     metadata,
     success_url: `${site}/portal-access.html?checkout=success`,
     cancel_url: `${site}/portal-access.html?checkout=cancelled`

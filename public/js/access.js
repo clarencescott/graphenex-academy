@@ -97,6 +97,8 @@ function planCard(plan, message) {
     card.append(orgInput);
   }
 
+  card.append(element("p", "", "Sales tax added at checkout where it applies"));
+
   const button = element("button", "primary-btn", "Buy now");
   button.type = "button";
   button.addEventListener("click", () => startCheckout(plan, orgInput?.value, message, button));
