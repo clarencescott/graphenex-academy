@@ -108,6 +108,14 @@ async function recordCourseCompletion(courseId) {
     completedCourseIds: arrayUnion(normalizedCourseId),
     updatedAt: new Date().toISOString()
   };
+  // Keep the first completion date so the training record shows when the course was first passed.
+  try {
+    const existing = await getDoc(doc(db, "users", user.uid));
+    const alreadyDone = (existing.data()?.completedCourseIds || []).includes(normalizedCourseId);
+    if (!alreadyDone) payload.completionDates = { [normalizedCourseId]: new Date().toISOString() };
+  } catch {
+    payload.completionDates = { [normalizedCourseId]: new Date().toISOString() };
+  }
   const writes = await Promise.allSettled(
     ["users", "profiles"].map((collectionName) =>
       setDoc(doc(db, collectionName, user.uid), payload, { merge: true })

@@ -37,7 +37,7 @@ function getYouTubeVideoId(source) {
   return /^[A-Za-z0-9_-]{11}$/.test(raw) ? raw : "";
 }
 
-function getCourseQuiz(course) {
+export function getCourseQuiz(course) {
   const rawQuiz = course.quiz;
   const rawQuestions = Array.isArray(rawQuiz)
     ? rawQuiz
