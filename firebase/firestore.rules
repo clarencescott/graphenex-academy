@@ -135,6 +135,19 @@ service cloud.firestore {
       allow create, update, delete: if false;
     }
 
+    // Watch progress for course videos. Each learner can only read and write their own.
+    match /videoProgress/{docId} {
+      allow get: if signedIn() && docId.matches(request.auth.uid + '_.*');
+      allow list: if signedIn() && resource.data.get('uid', '') == request.auth.uid;
+      allow create, update: if signedIn()
+        && docId.matches(request.auth.uid + '_.*')
+        && request.resource.data.get('uid', '') == request.auth.uid
+        && request.resource.data.get('percent', -1) is number
+        && exists(accessPath())
+        && hasTrainingAccess();
+      allow delete: if false;
+    }
+
     // Demo and license records are written only by the server.
     match /access/{uid} {
       allow get: if uidMatchesPath(uid);

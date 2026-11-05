@@ -2,6 +2,7 @@
 import { collection, getDocs } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
 import { db } from "./firebase.js";
 import { ensureAccess, showAdminOrganization } from "./access.js";
+import { UNLOCK_PERCENT, getVideoPercent, loadVideoProgress, openCourseVideo } from "./video.js";
 
 const container = document.getElementById("coursesContainer");
 const quizModal = document.getElementById("courseQuizModal");
@@ -180,19 +181,20 @@ function renderQuiz(panel, course) {
 function renderCourse(course) {
   const rawVideo = String(course.videoID ?? "").trim();
   const videoId = getYouTubeVideoId(rawVideo);
-  const videoUrl = videoId ? `https://www.youtube.com/watch?v=${videoId}` : rawVideo;
   const videoPreview = videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : "";
   const videoPreviewHtml = videoPreview
-    ? `<a class="course-video-link" href="${escapeHtml(videoUrl)}" target="_blank" rel="noopener noreferrer">
+    ? `<button class="course-video-link" type="button" data-watch aria-label="Watch ${escapeHtml(course.title ?? "course video")}">
         <div class="course-video-preview">
           <img src="${escapeHtml(videoPreview)}" alt="Video thumbnail for ${escapeHtml(course.title ?? "course video")}" />
-          <div class="video-overlay"><span>Preview course</span></div>
+          <div class="video-overlay"><span>Watch course</span></div>
         </div>
-      </a>`
+      </button>`
     : '<div class="course-video-placeholder" aria-hidden="true"></div>';
-  const startButton = videoUrl
-    ? `<a class="course-start-button" href="${escapeHtml(videoUrl)}" target="_blank" rel="noopener noreferrer">Start</a>`
-    : '<button class="course-start-button" type="button" disabled title="No course video is available">Start</button>';
+  const startButton = videoId
+    ? '<button class="course-start-button" type="button" data-watch>Watch</button>'
+    : rawVideo
+      ? `<a class="course-start-button" href="${escapeHtml(rawVideo)}" target="_blank" rel="noopener noreferrer">Start</a>`
+      : '<button class="course-start-button" type="button" disabled title="No course video is available">Start</button>';
 
   const card = document.createElement("article");
   card.className = "card firebase-course-card";
@@ -212,8 +214,13 @@ function renderCourse(course) {
     card.querySelector(".course-completed-badge").hidden = false;
   }
 
+  card.querySelectorAll("[data-watch]").forEach((button) => {
+    button.addEventListener("click", () => openCourseVideo(course, videoId));
+  });
+
   const toggle = card.querySelector(".course-quiz-toggle");
   toggle.addEventListener("click", () => {
+    if (!isQuizUnlocked(course)) return;
     if (!quizModal || !quizModalTitle || !quizModalContent) {
       console.error("Course quiz modal is unavailable.");
       return;
@@ -226,6 +233,13 @@ function renderCourse(course) {
   return card;
 }
 
+// Courses whose video can't be tracked (no YouTube video) are not gated.
+function isQuizUnlocked(course) {
+  if (window.courseCompletionIds.includes(course.id)) return true;
+  if (!getYouTubeVideoId(course.videoID)) return true;
+  return getVideoPercent(course.id) >= UNLOCK_PERCENT;
+}
+
 function updateCourseCompletionBadges() {
   container?.querySelectorAll(".firebase-course-card").forEach((card, index) => {
     const course = window.firebaseCourses[index];
@@ -235,7 +249,14 @@ function updateCourseCompletionBadges() {
       const completed = window.courseCompletionIds.includes(course.id);
       badge.hidden = !completed;
       if (toggle) {
-        toggle.textContent = completed ? "Retake Quiz" : "Take Quiz";
+        const unlocked = isQuizUnlocked(course);
+        toggle.disabled = !unlocked;
+        toggle.textContent = completed
+          ? "Retake Quiz"
+          : unlocked
+            ? "Take Quiz"
+            : `Quiz locked: ${getVideoPercent(course.id)}% watched`;
+        toggle.title = unlocked ? "" : `Watch ${UNLOCK_PERCENT}% of the video to unlock the quiz`;
       }
     }
   });
@@ -342,7 +363,7 @@ async function loadCourses() {
     return courses;
   });
 
-  await window.firebaseCoursesReady;
+  return window.firebaseCoursesReady;
 }
 
 window.grapheneAuth.observeAuthState(async (user) => {
@@ -357,7 +378,9 @@ window.grapheneAuth.observeAuthState(async (user) => {
 
   const access = await ensureAccess();
   if (access?.state !== "expired") {
-    await loadCourses();
+    const courses = await loadCourses();
+    await loadVideoProgress(courses || []);
+    updateCourseCompletionBadges();
   }
 
   if (masterDashboard) {
@@ -386,6 +409,7 @@ window.grapheneAuth.observeAuthState(async (user) => {
 });
 
 document.addEventListener("course-progress-updated", updateCourseCompletionBadges);
+document.addEventListener("course-video-progress", updateCourseCompletionBadges);
 document.getElementById("courseQuizModalClose")?.addEventListener("click", () => quizModal?.close());
 quizModal?.addEventListener("click", (event) => {
   if (event.target === quizModal) {
