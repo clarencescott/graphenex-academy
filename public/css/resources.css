@@ -26,3 +26,6 @@
 .resource-takeaways { padding: 12px 14px; border-radius: 10px; background: hsl(var(--secondary) / 0.6); }
 .resource-takeaways ul { margin: 8px 0 0; padding-left: 1.2rem; display: grid; gap: 4px; }
 .resource-body button { justify-self: start; }
+
+.master-dashboard-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+#downloadMyRecord { margin-top: 12px; }

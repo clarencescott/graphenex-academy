@@ -598,6 +598,7 @@
                 <div id="progressFillBar" class="progress-fill"></div>
               </div>
               <span id="progressStateLabel" class="mono-label state-label">0% Completed</span>
+              <button id="downloadMyRecord" class="outline-btn" type="button">Download my training record (PDF)</button>
 
               <div class="progress-stats">
                 <div class="progress-stat">
@@ -625,7 +626,10 @@
                   <div class="mono-label">Administrator View</div>
                   <h2 id="masterDashboardTitle">Learner Progress</h2>
                 </div>
-                <button id="masterRefreshButton" class="secondary-btn" type="button">Refresh Users</button>
+                <div class="master-dashboard-actions">
+                  <button id="downloadOrgReport" class="primary-btn" type="button">Download organization report (PDF)</button>
+                  <button id="masterRefreshButton" class="secondary-btn" type="button">Refresh Users</button>
+                </div>
               </div>
               <div class="master-dashboard-stats" aria-live="polite">
                 <div class="master-dashboard-stat">
@@ -1148,6 +1152,7 @@
       document.addEventListener('access-ready', refreshHub);
     </script>
     <script type="module" src="/js/courses.js"></script>
+    <script type="module" src="/js/records.js"></script>
     <script type="module" src="/js/minigames-extra.js"></script>
     <script type="module" src="/js/resources.js"></script>
     <script type="module" src="/js/firebase.js"></script>
